@@ -4,33 +4,31 @@ Definition of Key Functionalities: [https://specs.govstack.global/architecture/5
 
 
 
-## Document Management
+## Document Life Cycle
 
-The system shall support the storage, retrieval, and management of digital documents:
+### Document Creation
 
-*
-*
-*
+* API or via UI accepting content and creating document
+  * Access to predefined templates, and ability to customise templates (e.g. template of information to be submitted to create document, pre-defined set of information)
+    * Support for standard metadata schemas like Dublin Core, DCAT-AP, and EIRA — and allow you to create your own custom metadata fields
+  * Automapping data from the document into metadata, to reduce manual data duplication, as often metadata content is already inside the file
 
-### Sharing
+### Document Storage
 
-The system shall allow for document sharing and collaboration among authorised stakeholders.
+#### Information Organisational Architecture
 
-### Upload
+* The DMS should support nested folder structure that follows local legal requirements. For example in Estonia it is: Function → Activity → Record Series → File → Record (or similar, as these might not be well translated..)
 
-Efficient document uploading and retrieval
+#### Versioning
 
-For Documents upload, ideal would also be automapping data from the document into metadata, to reduce manual data duplication, as often metadata content is already inside the file
+* No change without Versioning
+* Automated versioning of all documents on multiple levels
+* Option to jump to previous version of a file
 
-### File Storage
+#### To be discussed
 
-Question: What file formats are currently used, what needs to be prepared for future formats in a way like: “files as code” “documents as code” (not to confuse with “documentation as code”)
-
-Automated versioning of all documents on multiple levels
-
-Also support "delta storage" — this means storing only the changes between document versions, not the whole file each time. Also label versions as "major" or "minor" (e.g., version 2.0 vs 2.1).
-
-Support for standard metadata schemas like Dublin Core, DCAT-AP, and EIRA — and allow you to create your own custom metadata fields
+* Also support "delta storage" — this means storing only the changes between document versions, not the whole file each time. Also label versions as "major" or "minor" (e.g., version 2.0 vs 2.1).
+  * Has downsides: a corrupted increment let's the whole file be unsuable
 
 Future – “Files as code” / “Documents as code” (not to confuse with “doc as code”):
 
@@ -39,23 +37,43 @@ Future – “Files as code” / “Documents as code” (not to confuse with �
 * Provide a schema registry for document-as-code templates (JSON Schema / XML Schema validation).
 * Support versioning at the clause/field level (not just whole file).
 
-### Navigation
+### Document Collaboration
 
-The DMS should support nested folder structure that follows local legal requirements. For example in Estonia it is: Function → Activity → Record Series → File → Record (or similar, as these might not be well translated..)
+#### Search
 
-### Search
+* Robust document search functionality through the metadata captured within the system.
+* Allow full-text search inside documents that have been processed by OCR (optical character recognition), and allow searching on any metadata field, including custom fields you create.
+* For search I would also add searching from document content, not only metadata, as there is often key data in the content.
 
-Robust document search functionality through the metadata captured within the system.
+#### Sharing
 
-Allow full-text search inside documents that have been processed by OCR (optical character recognition), and allow searching on any metadata field, including custom fields you create.
+* The system shall allow for document sharing and collaboration among authorised stakeholders.
 
-For the public website: Allow documents to be marked as "not yet published" so only staff can see them. Allow scheduling of publication and automatic removal on a specific date.
+### Records Management
 
-For search I would also add searching from document content, not only metadata, as there is often key data in the content.
+#### Archiving
 
-### File Creation
+The system shall have an inbuilt archival system that:
 
-Access to predefined templates, and ability to customise templates
+* Enables efficient search and retrieval of files
+* Preserves digital files in compliance with the country’s legal and regulatory requirements.
+* Capture all relevant metadata for the archived documents
+
+The archival system shall be designed to handle a large volume of files, ensuring scalability and optimal performance even as the file repository grows over time.
+
+Based on MoReq2010 and OAIS standards
+
+* Retention and disposal schedules: The system must automatically delete or freeze documents after their legal retention period ends, according to rules you define.
+* Format migration policy: The system must warn an administrator when a file format is becoming obsolete (e.g., PDF/A-1 is old; the system should suggest migrating to PDF/A-4).
+* Support for archival packages: The system must work with SIP (Submission Information Package), AIP (Archival Information Package), and DIP (Dissemination Information Package) these are standard ways of packaging documents for long-term archives.
+* Checksum management: Every file must have a SHA-256 checksum (a unique digital fingerprint). The system must periodically verify that files still match their checksum (to detect corruption).
+* Legal hold: The system must allow administrators to "freeze" a document so that it cannot be deleted or altered, even if the retention schedule says it should be deleted. This is used when a document is needed for a legal investigation.
+
+#### Delete/Destruction
+
+* Soft Delete
+* Hard Delete
+  * Restrictions for hard delete for example: Require two admin approvals to delete a file or add a flag to prevent deletion of files by any, even admin, user
 
 ## Workflow Engine
 
@@ -63,6 +81,7 @@ Access to predefined templates, and ability to customise templates
 2. Parallel and ordered steps, can be combined (so you have initially ordered from manager -> manager -> CEO and then parallel for all employees for acknowledgement as most common use case)
 3. Good to have - "picking feature". So that document is assigned to whole accountants team and first person in accountants team who will pick it, will handle it and then it is dismissed for others. Or assigments to unit level is maybe better wording..
 4. Timings / notifications - for example need to get a doc reviewed periodically, so it sends a notification once per quarter..
+5. For the public website: Allow documents to be marked as "not yet published" so only staff can see them. Allow scheduling of publication and automatic removal on a specific date.
 
 ## Logging and monitoring
 
@@ -77,22 +96,22 @@ The system shall support the features below without affecting performance of the
 * For logging it is important that data is clean from any data that falls under GDPR or otherwise private, but same time we need to have logs, so it should be ID / UUID / obfuscated data
 * Both logging and monitoring should cover product itself and also integrations (this integrations part is often overseen)
 
-
-
 ## User Authentication and Access Control
 
 The system shall provide secure user authentication to ensure only authorised individuals can access.
 
-Different user roles (e.g., administrators, cabinet and administration staff, citizen) shall be defined with appropriate access levels and permissions.
-
-Access control shall be granular, allowing administrators to manage user roles and permissions effectively.
-
 The solution shall have the provision to integrate with information mediator, identity management, consent, and digital signing solutions.
 
 * Authentication standards to support: SAML and OpenID Connect (OIDC) these allow the system to work with national eID schemes (eIDAS) and European Blockchain Services Infrastructure (EBSI).
-* Add a second type of access control called ABAC (Attribute-Based Access Control). Example: "Only people from the Tax Department who have a clearance level of 'confidential' can see tax documents."
-* &#x20;Add a "break-glass" procedure this allows a trusted administrator to override access rules in an emergency (e.g., a police investigation). Every such override must be logged.
 * Specify the integration: The FMS must expose REST APIs so that external systems (identity management, consent management, digital signing) can connect to it.
+
+## Permission Management
+
+* Different user roles (e.g., administrators, cabinet and administration staff, citizen) shall be defined with appropriate access levels and permissions.
+* Access control shall be granular, allowing administrators to manage user roles and permissions effectively.
+* Add a second type of access control called ABAC (Attribute-Based Access Control). Example: "Only people from the Tax Department who have a clearance level of 'confidential' can see tax documents."
+* Permission Inheritance
+* Optional, dependent on national regulations: Add a "break-glass" procedure this allows a trusted administrator to override access rules in an emergency (e.g., a police investigation). Every such override must be logged.
 
 ## Security and Privacy
 
@@ -146,23 +165,7 @@ Predefined reports to include:
 
 Export formats allowed: CSV, JSON, XML, and PDF/A (for human-readable reports)
 
-## Digital Archiving
 
-The system shall have an inbuilt archival system that:
-
-* Enables efficient search and retrieval of files
-* Preserves digital files in compliance with the country’s legal and regulatory requirements.
-* Capture all relevant metadata for the archived documents
-
-The archival system shall be designed to handle a large volume of files, ensuring scalability and optimal performance even as the file repository grows over time.
-
-Based on MoReq2010 and OAIS standards
-
-* Retention and disposal schedules: The system must automatically delete or freeze documents after their legal retention period ends, according to rules you define.
-* Format migration policy: The system must warn an administrator when a file format is becoming obsolete (e.g., PDF/A-1 is old; the system should suggest migrating to PDF/A-4).
-* Support for archival packages: The system must work with SIP (Submission Information Package), AIP (Archival Information Package), and DIP (Dissemination Information Package) these are standard ways of packaging documents for long-term archives.
-* Checksum management: Every file must have a SHA-256 checksum (a unique digital fingerprint). The system must periodically verify that files still match their checksum (to detect corruption).
-* Legal hold: The system must allow administrators to "freeze" a document so that it cannot be deleted or altered, even if the retention schedule says it should be deleted. This is used when a document is needed for a legal investigation.
 
 ## Integration and Accessibility
 
