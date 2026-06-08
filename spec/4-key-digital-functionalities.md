@@ -8,23 +8,29 @@ Definition of Key Functionalities: [https://specs.govstack.global/architecture/5
 
 The system shall support the storage, retrieval, and management of digital documents:
 
-* Access to predefined templates, and ability to customise templates
-* Efficient document uploading and retrieval
-* Automated versioning of all documents on multiple levels
-* Robust document search functionality through the metadata captured within the system.
-* Public website that supports automatic publishing of documents from the system
+*
+*
+*
+
+### Sharing
 
 The system shall allow for document sharing and collaboration among authorised stakeholders.
 
+### Upload
+
+Efficient document uploading and retrieval
+
+For Documents upload, ideal would also be automapping data from the document into metadata, to reduce manual data duplication, as often metadata content is already inside the file
+
+### File Storage
+
 Question: What file formats are currently used, what needs to be prepared for future formats in a way like: “files as code” “documents as code” (not to confuse with “documentation as code”)
 
-For versioning: Also support "delta storage" — this means storing only the changes between document versions, not the whole file each time. Also label versions as "major" or "minor" (e.g., version 2.0 vs 2.1).
+Automated versioning of all documents on multiple levels
 
-For search: Allow full-text search inside documents that have been processed by OCR (optical character recognition), and allow searching on any metadata field, including custom fields you create.
+Also support "delta storage" — this means storing only the changes between document versions, not the whole file each time. Also label versions as "major" or "minor" (e.g., version 2.0 vs 2.1).
 
-For the public website: Allow documents to be marked as "not yet published" so only staff can see them. Allow scheduling of publication and automatic removal on a specific date.
-
-New item to add: Support for standard metadata schemas like Dublin Core, DCAT-AP, and EIRA — and allow you to create your own custom metadata fields
+Support for standard metadata schemas like Dublin Core, DCAT-AP, and EIRA — and allow you to create your own custom metadata fields
 
 Future – “Files as code” / “Documents as code” (not to confuse with “doc as code”):
 
@@ -33,11 +39,32 @@ Future – “Files as code” / “Documents as code” (not to confuse with �
 * Provide a schema registry for document-as-code templates (JSON Schema / XML Schema validation).
 * Support versioning at the clause/field level (not just whole file).
 
+### Navigation
+
+The DMS should support nested folder structure that follows local legal requirements. For example in Estonia it is: Function → Activity → Record Series → File → Record (or similar, as these might not be well translated..)
+
+### Search
+
+Robust document search functionality through the metadata captured within the system.
+
+Allow full-text search inside documents that have been processed by OCR (optical character recognition), and allow searching on any metadata field, including custom fields you create.
+
+For the public website: Allow documents to be marked as "not yet published" so only staff can see them. Allow scheduling of publication and automatic removal on a specific date.
+
+For search I would also add searching from document content, not only metadata, as there is often key data in the content.
+
+### File Creation
+
+Access to predefined templates, and ability to customise templates
+
 ## Workflow Engine
 
-Input by Hannes?
+1. Predefined workflows that support role based and person based assignments (sometimes you need a workflow where document goes to direct manager, sometimes you need document that goes to role X and sometimes you need a flow where it always goes to specific person)
+2. Parallel and ordered steps, can be combined (so you have initially ordered from manager -> manager -> CEO and then parallel for all employees for acknowledgement as most common use case)
+3. Good to have - "picking feature". So that document is assigned to whole accountants team and first person in accountants team who will pick it, will handle it and then it is dismissed for others. Or assigments to unit level is maybe better wording..
+4. Timings / notifications - for example need to get a doc reviewed periodically, so it sends a notification once per quarter..
 
-## Monitoring
+## Logging and monitoring
 
 The system shall support the features below without affecting performance of the system.
 
@@ -47,6 +74,8 @@ The system shall support the features below without affecting performance of the
   * How long it takes to retrieve a document on average
   * Show daily or weekly trends of how many documents are created, changed, or deleted
 * Data Analysis and Reporting
+* For logging it is important that data is clean from any data that falls under GDPR or otherwise private, but same time we need to have logs, so it should be ID / UUID / obfuscated data
+* Both logging and monitoring should cover product itself and also integrations (this integrations part is often overseen)
 
 
 
@@ -72,6 +101,8 @@ The system shall prioritise robust security measures to protect sensitive inform
 It shall employ encryption protocols and secure data transmission methods particularly for data storage.
 
 The system shall have secure storage mechanisms and backup procedures to ensure data integrity and availability.
+
+Authorisation layer (who can access what) must be same across UI, API, search. So that same rules are applied always, no matter what mechanism is used to fetch the data
 
 It shall comply with relevant data protection and privacy regulations, safeguarding the confidentiality of information.
 
@@ -161,7 +192,17 @@ Where AI can be used safely (low-risk areas)
 
 Note: If you choose to use AI, no document content may ever be sent to an external provider (like OpenAI, Google, or Microsoft). Every action taken by AI must be recorded in the audit log.
 
-## Infrastructure
+## Integration with other Building Blocks
+
+### Digital Signatures
+
+Digital signatures is important part, so maybe in general AIDES support in this spec level? But basically, system should be able to retreive information from signed containers, show files, file contents, sign documents, etc.
+
+### Content Management System
+
+Public website that supports automatic publishing of documents from the system
+
+### Cloud Infrastructure
 
 Any details about infrastructure requirements in terms of hosting requirements, minimum connectivity bandwidth, storage, etc
 
