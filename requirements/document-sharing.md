@@ -69,7 +69,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS produces a copy of a document with selected personal data redacted, and keeps the original unchanged."
     documentation: |
-      Source: first write-up in bb-file-management (data minimisation by redaction).
+      Data minimisation by redaction.
     api_operation_id:
     test:
 ---
@@ -80,4 +80,4 @@ Document Sharing covers the ways an item leaves its Container's normal permissio
 
 The links serve citizen-facing cases: a permit handed out for download, or evidence collected from an applicant without a portal account. Where the service application authenticates the citizen and streams the File itself, neither is needed.
 
-All requirements are RECOMMENDED, so that a solution without any sharing feature still conforms to the core. Co-editing with external partners and federated sharing between organisations are in the Working Document Collaboration extension.
+Co-editing with external partners and federated sharing between organisations are in the Working Document Collaboration extension.
