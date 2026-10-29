@@ -16,8 +16,7 @@ requirements:
     contract: "govstack:spec:bb:information-mediator"
     statement: "The DMS sends a Records Document with its metadata to another organisation's DMS in an agreed exchange envelope through the Information Mediator BB."
     documentation: |
-      Source: FMS Working Group meeting of 2026-06-01 (minimum document exchange envelope accepted
-      by every DMS in Estonia). Which envelope specification to refer to is an open question.
+      Which envelope specification to refer to is an open question.
     api_operation_id:
     test:
   # XCH-2 (working label; the number is issued on acceptance)
