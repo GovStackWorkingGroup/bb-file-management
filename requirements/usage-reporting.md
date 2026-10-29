@@ -14,8 +14,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS reports the storage used per Container and in total."
-    documentation: |
-      Source: first write-up in bb-file-management (monitoring and statistics).
     api_operation_id:
     test:
   # RPT-2 (working label; the number is issued on acceptance)
