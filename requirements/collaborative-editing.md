@@ -24,8 +24,7 @@ requirements:
     interaction: USER_INTERFACE
     statement: "The DMS lets several users edit the same Working Document at the same time in a web browser, through a built-in or connected editor."
     documentation: |
-      Constraint: a connected editor MAY be attached through the Web Application Open Platform
-      Interface (WOPI).
+      A connected editor MAY be attached through the Web Application Open Platform Interface (WOPI).
     api_operation_id:
     test:
   # WRK-3 (working label; the number is issued on acceptance)
@@ -40,7 +39,7 @@ requirements:
   # WRK-4 (working label; the number is issued on acceptance)
   - id:
     status: DRAFT
-    level: REQUIRED
+    level: RECOMMENDED
     observability: OBSERVABLE
     interaction: USER_INTERFACE
     statement: "The DMS displays a preview of PDF, image and common office formats without downloading the File."
@@ -52,9 +51,7 @@ requirements:
     level: REQUIRED
     observability: OBSERVABLE
     interaction: USER_INTERFACE
-    statement: "The DMS synchronises Containers with desktop and mobile clients and applies the same permissions there as on the web (see ACC-4)."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01.
+    statement: "The DMS synchronises Containers with desktop and mobile clients and applies the same permissions there as on the web."
     api_operation_id:
     test:
   # WRK-6 (working label; the number is issued on acceptance)
@@ -107,24 +104,13 @@ requirements:
     status: DRAFT
     level: RECOMMENDED
     observability: OBSERVABLE
-    interaction: SERVICE_API
-    statement: "The DMS stores a label or comment with a Version."
+    interaction: PROTOCOL
+    statement: "The DMS shares a Container with a user at another organisation through Open Cloud Mesh, without a shared user account."
+    documentation: |
+      Contract with Open Cloud Mesh (OCM) protocol, IETF
     api_operation_id:
     test:
   # WRK-12 (working label; the number is issued on acceptance)
-  - id:
-    status: DRAFT
-    level: RECOMMENDED
-    observability: OBSERVABLE
-    interaction: PROTOCOL
-    contract: "Open Cloud Mesh (OCM) protocol, IETF draft"
-    statement: "The DMS shares a Container with a user at another organisation through Open Cloud Mesh, without a shared user account."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01. Can become REQUIRED once support in all
-      reference products is confirmed.
-    api_operation_id:
-    test:
-  # WRK-13 (working label; the number is issued on acceptance)
   - id:
     status: DRAFT
     level: RECOMMENDED
