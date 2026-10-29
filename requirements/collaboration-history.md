@@ -42,4 +42,4 @@ requirements:
 
 Collaboration History is a lighter form of the activity trail that Records Management requires. It records no read events and needs no protection against alteration, but it lets collaborators answer the everyday question of who changed what.
 
-What a solution records is the creation of a Working Document, each new Version, and each rename, move, share and delete. Comparing two Versions, or the change tracking of the editor, shows what changed in the content.
+What a software solution records is the creation of a Working Document, each new Version, and each rename, move, share and delete. Comparing two Versions, or the change tracking of the editor, shows what changed in the content.
