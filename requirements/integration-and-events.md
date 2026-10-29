@@ -51,11 +51,9 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    contract: "IETF RFC 4918, HTTP Extensions for WebDAV"
     statement: "The DMS offers access to Containers and Files over WebDAV."
     documentation: |
-      Most candidate products already offer WebDAV. Whether the Service API of this specification
-      adopts a WebDAV profile is an open question.
+      Whether the Service API of this specification adopts a WebDAV profile is an open question. Possible contract classifiers IETF RFC 4918, HTTP Extensions for WebDAV
     api_operation_id:
     test:
   # INT-6 (working label; the number is issued on acceptance)
@@ -64,10 +62,9 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    contract: "OASIS Content Management Interoperability Services (CMIS) Version 1.1"
     statement: "The DMS offers the document and folder services of CMIS."
     documentation: |
-      Source: first write-up in bb-file-management.
+      Possible contract classifiers: OASIS Content Management Interoperability Services (CMIS) Version 1.1
     api_operation_id:
     test:
 ---
