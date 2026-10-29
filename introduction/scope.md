@@ -68,4 +68,4 @@ The Document Management Building Block performs no role in a Domain Reference Ar
 
 ## Ownership
 
-Owned by the File Management Working Group, which works on this specification under the name Document Management. Change requests are raised as issues in the specification's repository, `bb-file-management`.
+Owned by the Document Management Working Group
