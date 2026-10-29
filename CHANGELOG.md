@@ -85,12 +85,11 @@ Added by this draft: INT-5 (WebDAV access), because most candidate products offe
 
 ### Considered and not taken
 
-| Item from the first write-up | Reason |
+| Consideration | Reason |
 |---|---|
-| Delta storage of Versions | An implementation choice; the write-up itself notes the risk of a corrupted increment |
-| Documents as code (declarative source with rendering to PDF/A) | Marked as future in the write-up; listed in the open questions |
+| Delta storage of Versions | An implementation choice; the working group discussed the risk of a corrupted increment |
+| Documents as code (declarative source with rendering to PDF/A) | Marked as future; listed in the open questions |
 | Semantic search and anomaly detection by AI | Not yet stated as verifiable behaviour; MET-16 already keeps content inside the deployment |
 | Scheduled publication and removal on public websites | Belongs to a Content Management System Building Block |
 | SAML and OIDC, AES-256 and TLS 1.3, WCAG 2.1 AA | Inherited from the cross-functional requirements |
 | Two data centres, RPO and RTO, sizing tool | Deployment and hosting concerns, outside the system under test |
-| Privacy impact assessment template | Documentation that accompanies a deployment, not a behaviour of the software |
