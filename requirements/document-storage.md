@@ -51,8 +51,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS stores replaced content as a new Version under the same identifier."
-    documentation: |
-      Constraint: no change to the content of a Document or File is stored without a new Version.
     api_operation_id:
     test:
   # STO-6 (working label; the number is issued on acceptance)
@@ -81,8 +79,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS keeps a deleted File recoverable for a configured period before purging it."
     documentation: |
-      Extends govstack-cfr-data#req-7 from RECOMMENDED to REQUIRED for this Building Block,
-      because a citizen's lost submission is costly to recover.
+      Extends govstack-cfr-data#req-7 from RECOMMENDED to REQUIRED for this Building Block, because a citizen's lost submission is costly to recover.
     api_operation_id:
     test:
   # STO-9 (working label; the number is issued on acceptance)
@@ -92,9 +89,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS assigns a Container to an organisational unit with one or more managers, so that its contents remain available when a user account is removed."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-08-31 (organisation-owned spaces instead of files
-      owned by individuals).
     api_operation_id:
     test:
   # STO-10 (working label; the number is issued on acceptance)
@@ -105,8 +99,7 @@ requirements:
     interaction: FILE
     statement: "The DMS exports all Files of a Container, with their folder structure, in open and documented formats."
     documentation: |
-      Purpose: documents stay usable if the product is switched off or replaced (exit-first
-      strategy, FMS Working Group meeting of 2026-08-31).
+      Purpose: documents stay usable if the product is switched off or replaced (exit-first strategy)
     api_operation_id:
     test:
   # STO-11 (working label; the number is issued on acceptance)
@@ -170,8 +163,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS labels each Version as a major or a minor Version."
-    documentation: |
-      Source: first write-up in bb-file-management (version labels such as 2.0 and 2.1).
     api_operation_id:
     test:
   # STO-18 (working label; the number is issued on acceptance)
@@ -181,8 +172,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS rejects the deletion of an item that an authorised user has marked as protected, until the mark is removed."
-    documentation: |
-      Source: first write-up in bb-file-management (flag that prevents deletion).
     api_operation_id:
     test:
   # STO-19 (working label; the number is issued on acceptance)
@@ -192,17 +181,15 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS purges a deleted item before the end of its recovery period only after a second authorised user approves the purge."
-    documentation: |
-      Source: first write-up in bb-file-management (two approvals for a hard delete).
     api_operation_id:
     test:
 ---
 
 # Description
 
-Document Storage is the part of the DMS every other functionality relies on. A service application or an official submits a File, and the DMS returns an identifier that stays valid when the File is renamed or moved. Replacing the content never overwrites it: each change is a new Version, and earlier Versions can be listed and retrieved.
+Document Storage is the part of the DMS every other functionality relies on. A service application or an official submits a File, and the DMS returns an identifier that stays valid when the File is renamed or moved. Replacing the content never overwrites it.
 
-Files live in Containers, such as folders, team spaces or case files. A Container belongs to an organisational unit rather than to one person (STO-9), so that documents survive staff changes. The whole content of a Container can be exported with its structure in open formats (STO-10), so that documents stay usable whatever happens to the product.
+Files live in Containers, such as folders, team spaces or case files. A Container belongs to an organisational unit rather than to one person (STO-9), so that documents survive staff changes. The whole content of a Container can be exported with its structure in open formats (STO-10), so that documents stay usable whatever happens to the software solution.
 
 Deletion is reversible for a configured period (STO-8). Optional safeguards add protection marks (STO-18) and a second approval before an early purge (STO-19). Records Documents follow the stricter deletion rules of *Classification and Retention*.
 
