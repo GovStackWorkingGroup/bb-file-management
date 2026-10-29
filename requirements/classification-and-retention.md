@@ -13,6 +13,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS assigns each Records Document, in process or finalized, to one class of a hierarchical classification scheme."
     documentation: |
       The scheme follows local legal requirements and may have several levels, for example
@@ -24,6 +25,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS applies the access rules defined on a class to every Records Document in that class."
     api_operation_id:
     test:
@@ -32,6 +34,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS applies to each Records Document the retention period, trigger event and disposition action of its class."
     api_operation_id:
     test:
@@ -40,6 +43,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS groups Records Documents into a records aggregation and rejects additions to the aggregation once it is closed."
     api_operation_id:
     test:
@@ -48,6 +52,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS rejects the deletion of a finalized Records Document other than through an approved disposition."
     api_operation_id:
     test:
@@ -56,6 +61,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS lists the Records Documents whose retention period has ended, for review."
     api_operation_id:
     test:
@@ -64,6 +70,7 @@ requirements:
     status: DRAFT
     level: REQUIRED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS performs a disposition action only after an authorised user approves it."
     api_operation_id:
     test:
@@ -72,6 +79,7 @@ requirements:
     status: DRAFT
     level: RECOMMENDED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS starts a retention period when it receives the trigger event through its API, such as the closure of a case."
     api_operation_id:
     test:
@@ -80,6 +88,7 @@ requirements:
     status: DRAFT
     level: RECOMMENDED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS places and lifts a legal hold on Records Documents and suspends their disposition while the hold applies."
     api_operation_id:
     test:
@@ -88,6 +97,7 @@ requirements:
     status: DRAFT
     level: RECOMMENDED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS keeps a disposition record with identifier, class, title, action, approver and date after destroying a Records Document."
     api_operation_id:
     test:
@@ -96,6 +106,7 @@ requirements:
     status: DRAFT
     level: RECOMMENDED
     observability: OBSERVABLE
+    interaction: SERVICE_API
     statement: "The DMS destroys a Records Document only after two different authorised users approve the destruction."
     api_operation_id:
     test:
