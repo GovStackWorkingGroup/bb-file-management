@@ -16,8 +16,7 @@ requirements:
     interaction: INTERNAL
     statement: "The DMS records each create, view, download, update, move, permission change, process step, approval, signature and deletion of a Records Document with the actor and a UTC timestamp."
     documentation: |
-      Extends govstack-cfr-data#req-9. Evidence a vendor produces: a sample activity log covering
-      each listed action, and the configuration that enables it.
+      Extends govstack-cfr-data#req-9. Conformance evidence a software provider produces: a sample activity log covering each listed action, and the configuration that enables it.
     api_operation_id:
     test:
   # ACT-2 (working label; the number is issued on acceptance)
@@ -55,8 +54,7 @@ requirements:
     interaction: INTERNAL
     statement: "The DMS protects the activity trail of Records Documents against alteration, so that any change or deletion of an entry is detectable."
     documentation: |
-      Evidence a vendor produces: a description of the integrity mechanism, such as hash chaining
-      or write-once storage, and a verification run.
+      Conformance evidence a software provider produces: a description of the integrity mechanism, such as hash chaining or write-once storage, and a verification run.
     api_operation_id:
     test:
   # ACT-6 (working label; the number is issued on acceptance)
@@ -66,8 +64,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS records whether a person performed an action directly or an automated agent performed it on the person's behalf, and which agent."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01.
     api_operation_id:
     test:
   # ACT-7 (working label; the number is issued on acceptance)
@@ -78,9 +74,7 @@ requirements:
     interaction: INTERNAL
     statement: "The DMS refuses an operation on a Records Document when it cannot write the activity record for that operation."
     documentation: |
-      Source: first write-up in bb-file-management (no operation without a log entry). Evidence a
-      vendor produces: a description of how the operation and its activity record are written
-      together, and a test that shows an operation is refused when logging fails.
+      Conformance evidence a software provider produces: a description of how the operation and its activity record are written together, and a test that shows an operation is refused when logging fails.
     api_operation_id:
     test:
   # ACT-8 (working label; the number is issued on acceptance)
@@ -89,10 +83,9 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: FILE
-    contract: "IETF RFC 5424, The Syslog Protocol"
     statement: "The DMS exports activity records in the syslog format."
     documentation: |
-      Source: first write-up in bb-file-management (export for security monitoring systems).
+      Possible contract classifiers: IETF RFC 5424, The Syslog Protocol
     api_operation_id:
     test:
   # ACT-9 (working label; the number is issued on acceptance)
@@ -103,8 +96,7 @@ requirements:
     interaction: INTERNAL
     statement: "The DMS keeps activity records for a configured period of at least twelve months."
     documentation: |
-      Evidence a vendor produces: the retention configuration of the activity trail. Source: first
-      write-up in bb-file-management.
+      Conformance evidence a software provider produces: the retention configuration of the activity trail.
     api_operation_id:
     test:
   # ACT-10 (working label; the number is issued on acceptance)
@@ -114,8 +106,6 @@ requirements:
     observability: AUDITABLE
     interaction: INTERNAL
     statement: "The DMS identifies persons and documents in activity records by identifier, without names or document content."
-    documentation: |
-      Source: first write-up in bb-file-management (logs free of personal data).
     api_operation_id:
     test:
 ---
