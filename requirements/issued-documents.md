@@ -24,8 +24,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS records the data subjects to whom a Records Document is issued."
-    documentation: |
-      Builds on MET-11.
     api_operation_id:
     test:
   # DOC-3 (working label; the number is issued on acceptance)
@@ -56,9 +54,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS releases an issued document to a requester only against a time-limited grant scoped to that document and that requester."
     documentation: |
-      The grant is created by a requester gateway after it has checked the holder's presentation.
-      The gateway is described in the Credentials Reference Architecture, not in this
-      specification.
+      The grant is created by a requester gateway after it has checked the holder's presentation. The gateway is described in the Trust Framework Reference Architecture, not in this specification.
     api_operation_id:
     test:
   # DOC-6 (working label; the number is issued on acceptance)
@@ -126,6 +122,6 @@ sequenceDiagram
   R->>G: Request access
   G->>D: Create grant for this document and requester
   R->>D: Fetch document with the grant (DOC-5)
-  D-->>R: Document; release recorded (DOC-6)
+  D-->>R: Document, release recorded (DOC-6)
   R-->>R: Check content against the checksum
 ```
