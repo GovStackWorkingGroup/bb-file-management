@@ -10,10 +10,10 @@ abstract: |
 url: https://specs.govstack.global/document-management/
 repository: https://github.com/GovStackWorkingGroup/bb-file-management
 urn: govstack:spec:bb:dms
-owner_group: govstack:wg:dms # to be confirmed: File Management Working Group
+owner_group: govstack:wg:dms
 versions:
-  - version: 1.0-draft
-    url_suffix: /document-management/1.0-draft
+  - version: 0.3-draft
+    url_suffix: /document-management/0.3-draft
     release_date:
     latest: true
     short_description: First draft organised by capabilities, functionalities, a core and two extensions.
