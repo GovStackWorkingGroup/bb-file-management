@@ -17,7 +17,7 @@
       A Document created, received or maintained as evidence of an activity, decision or transaction, in pursuit of legal obligations or in the transaction of business.
       Note 1: it is created and changed only along a predefined process, and each Version captured during that process is part of its evidence.
       Note 2: after finalization the content of a Version is never altered; later changes are added as new, traceable Versions through an amendment process.
-      Note 3: "record" is used in the sense of ISO 15489-1, not of ISO 9001, where records are retained information that no longer changes.
+      Note 3: "record" is used in the sense of ISO 15489-1, not of ISO 9001 (where records are retained information that no longer changes).
     designated_at: adapted from ISO 15489-1:2016, 3.14
 - entry:
     designation: in process
