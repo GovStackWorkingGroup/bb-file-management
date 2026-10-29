@@ -25,8 +25,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS creates a Records Document of a document type from metadata fields alone, with Files as optional attachments."
     documentation: |
-      Source: FMS Working Group meeting of 2026-06-01 (a document is a structured set of
-      information; files are optional).
+      A document is a structured set of information; files are optional.
     api_operation_id:
     test:
   # REC-3 (working label; the number is issued on acceptance)
@@ -64,8 +63,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS adds a new Version to a finalized Records Document only through a predefined amendment process, and keeps earlier Versions unchanged and retrievable."
     documentation: |
-      Implements integrity in the sense of ISO 15489-1:2016: an authorised addition after creation
-      is explicitly indicated and traceable.
+      Implements integrity in the sense of ISO 15489-1:2016: an authorised addition after creation is explicitly indicated and traceable.
     api_operation_id:
     test:
   # REC-7 (working label; the number is issued on acceptance)
@@ -76,9 +74,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS stores signed Files and their detached signatures unchanged and keeps them linked."
     documentation: |
-      Creating and validating signatures is the e-Signature Building Block's job. A signature
-      applied during a process should be added before finalization, so that the checksum of REC-9
-      covers it.
+      Creating and validating signatures is the e-Signature Building Block's job. A signature applied during a process should be added before finalization, so that the checksum of REC-9 covers it.
     api_operation_id:
     test:
   # REC-8 (working label; the number is issued on acceptance)
@@ -97,8 +93,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS stores a SHA-256 checksum for each finalized Version and reports on request whether the content still matches it."
-    documentation: |
-      Source: first write-up in bb-file-management (checksum management).
     api_operation_id:
     test:
   # REC-10 (working label; the number is issued on acceptance)
@@ -107,8 +101,9 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: FILE
-    contract: "ISO 19005, Document management — Electronic document file format for long-term preservation (PDF/A)"
     statement: "The DMS produces an archival rendition in PDF/A at finalization and keeps the original alongside it."
+    documentation: |
+      Possible contract classifier: ISO 19005, Document management — Electronic document file format for long-term preservation (PDF/A)
     api_operation_id:
     test:
   # REC-11 (working label; the number is issued on acceptance)
@@ -117,11 +112,9 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: FILE
-    contract: "ETSI EN 319 162-1, Associated Signature Containers (ASiC)"
     statement: "The DMS lists the Files and the signer information inside an ASiC signature container without altering the container."
     documentation: |
-      Source: first write-up in bb-file-management (retrieving information from signed
-      containers).
+      For retrieving information from signed containers. Possbile contract classifiers: ETSI EN 319 162-1, Associated Signature Containers (ASiC)
     api_operation_id:
     test:
 ---
