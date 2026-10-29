@@ -81,8 +81,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS returns search results for a query that contains spelling errors, such as a mistyped name."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01.
     api_operation_id:
     test:
   # MET-9 (working label; the number is issued on acceptance)
@@ -92,8 +90,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS searches the content of Files inside compressed archives, such as ZIP files."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01.
     api_operation_id:
     test:
   # MET-10 (working label; the number is issued on acceptance)
@@ -115,8 +111,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS records one or more data subject identifiers on a Document or File and lists all items linked to a given data subject."
     documentation: |
-      Supports data subject access requests: one query returns every item that concerns a person,
-      across Containers and cases.
+      Supports data subject access requests: one query returns every item that concerns a person, across Containers and cases.
     api_operation_id:
     test:
   # MET-12 (working label; the number is issued on acceptance)
@@ -136,10 +131,9 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    contract: "ISO 15836-1:2017, Dublin Core metadata element set"
     statement: "The DMS returns the metadata of an item mapped to the Dublin Core elements."
     documentation: |
-      Source: first write-up in bb-file-management.
+      Possible contract classifiers: ISO 15836-1:2017, Dublin Core metadata element set
     api_operation_id:
     test:
   # MET-14 (working label; the number is issued on acceptance)
@@ -149,9 +143,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS proposes metadata values extracted from the content of an uploaded File, such as dates, names and reference numbers, and stores them only after a person confirms them."
-    documentation: |
-      Source: first write-up in bb-file-management (automatic metadata extraction with human
-      review).
     api_operation_id:
     test:
   # MET-15 (working label; the number is issued on acceptance)
@@ -161,8 +152,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS proposes a document type for an uploaded File and assigns it only after a person confirms the proposal."
-    documentation: |
-      Source: first write-up in bb-file-management (automatic classification).
     api_operation_id:
     test:
   # MET-16 (working label; the number is issued on acceptance)
@@ -173,9 +162,7 @@ requirements:
     interaction: INTERNAL
     statement: "The DMS processes document content for proposals and search without sending it to a service outside the deployment."
     documentation: |
-      Evidence a vendor produces: the architecture description of the components that analyse
-      content, with their network destinations, and the configuration that disables external
-      services.
+      Conformance evidence a software provider produces: the architecture description of the components that analyse content, with their network destinations, and the configuration that disables external services.
     api_operation_id:
     test:
   # MET-17 (working label; the number is issued on acceptance)
@@ -186,8 +173,7 @@ requirements:
     interaction: SERVICE_API
     statement: "On an authorised erasure request for a data subject, the DMS deletes or pseudonymises the items linked to that data subject, except items under a retention period or a legal hold."
     documentation: |
-      Source: first write-up in bb-file-management (right to erasure). Which rule wins when
-      erasure and retention conflict is an open question.
+      Right to erasure. Which rule wins when erasure and retention conflict is an open question.
     api_operation_id:
     test:
 ---
