@@ -24,9 +24,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS runs the steps of a records process in series, in parallel or in a combination of both, as the process definition sets."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01 and the first write-up in bb-file-
-      management.
     api_operation_id:
     test:
   # PRC-3 (working label; the number is issued on acceptance)
@@ -155,9 +152,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS exposes the configuration of document types, permissions and process definitions through its API."
-    documentation: |
-      Source: FMS Working Group meeting of 2026-06-01 (tenders that require full configuration
-      through the API).
     api_operation_id:
     test:
   # PRC-17 (working label; the number is issued on acceptance)
@@ -168,8 +162,7 @@ requirements:
     interaction: USER_INTERFACE
     statement: "The DMS completes an approve or sign step on behalf of a person through an automated agent only after that person confirms the step."
     documentation: |
-      Source: FMS Working Group meeting of 2026-06-01 (legal responsibility when an AI assistant
-      acts for a user).
+      Legal responsibility when an AI assistant acts for a user.
     api_operation_id:
     test:
   # PRC-18 (working label; the number is issued on acceptance)
@@ -179,8 +172,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS assigns a step to the manager of the person who started the process, taken from the organisation's structure."
-    documentation: |
-      Source: first write-up in bb-file-management (role-, person- and manager-based assignment).
     api_operation_id:
     test:
   # PRC-19 (working label; the number is issued on acceptance)
@@ -190,8 +181,6 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS lets one member of a group claim a step assigned to the group, and removes the step from the task lists of the other members."
-    documentation: |
-      Source: first write-up in bb-file-management (picking feature).
     api_operation_id:
     test:
   # PRC-20 (working label; the number is issued on acceptance)
@@ -201,15 +190,13 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS starts a review of a finalized Records Document at the recurring interval set in its document type."
-    documentation: |
-      Source: first write-up in bb-file-management (periodic review).
     api_operation_id:
     test:
 ---
 
 # Description
 
-Records Processes are the intra-system workflows of the DMS: the steps a Records Document passes through between declaration and finalization. Orchestration across systems and Building Blocks stays with the Workflow Building Block or another process engine. Both kinds were named as necessary in the FMS Working Group meeting of 2026-08-31, and neither replaces the other.
+Records Processes are the intra-system workflows of the DMS: the steps a Records Document passes through between declaration and finalization. Orchestration across systems and Building Blocks stays with the Workflow Building Block or another process engine.
 
 A process definition is a set of steps, each with an action and an assignee (PRC-1), arranged in series, in parallel or both (PRC-2). While a step is current, only its assigned editors may change the content (PRC-4). Every completed step is recorded (PRC-5), a rejection returns the record to an earlier step (PRC-6), and the record is finalized when the last step is completed (PRC-9).
 
