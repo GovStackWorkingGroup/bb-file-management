@@ -1,0 +1,30 @@
+---
+toc:
+  introduction:
+    - purpose.md
+    - overview.md
+    - scope.md
+    - references.yml
+    - terminology.yml
+  requirements:
+    # Core
+    - document-storage.md
+    - metadata-and-search.md
+    - access-control.md
+    - document-sharing.md
+    - integration-and-events.md
+    - usage-reporting.md
+    # Working Document Collaboration extension
+    - collaborative-editing.md
+    - collaboration-history.md
+    # Records Management extension
+    - records-capture.md
+    - records-processes.md
+    - classification-and-retention.md
+    - archival-preservation.md
+    - records-audit-trail.md
+    - document-exchange.md
+    - issued-documents.md
+  resources:
+    - reference-products.md
+    - open-questions.md

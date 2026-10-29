@@ -1,0 +1,27 @@
+---
+# Every external document the specification depends on.
+references:
+  records_management:
+    - ISO 15489-1:2016, Information and documentation — Records management — Part 1 - Concepts and principles, International Organization for Standardization, 2016.
+    - ISO 16175-1:2020, Information and documentation — Processes and functional requirements for software for managing records — Part 1, International Organization for Standardization, 2020.
+    - MoReq2010, Modular Requirements for Records Systems, DLM Forum Foundation, 2011.
+    - ISO 14721:2012, Space data and information transfer systems — Open archival information system (OAIS) — Reference model, International Organization for Standardization, 2012.
+    - E-ARK Submission Information Package (SIP) specification, Digital Information LifeCycle Interoperability Standards Board (DILCIS Board).
+  formats_and_metadata:
+    - ISO 19005, Document management — Electronic document file format for long-term preservation (PDF/A), International Organization for Standardization.
+    - ISO 15836-1:2017, Information and documentation — The Dublin Core metadata element set — Part 1 - Core elements, International Organization for Standardization, 2017.
+    - ETSI EN 319 162-1, Electronic Signatures and Infrastructures (ESI) — Associated Signature Containers (ASiC) — Part 1, European Telecommunications Standards Institute.
+  interfaces:
+    - IETF RFC 4918, HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV), 2007.
+    - OASIS Content Management Interoperability Services (CMIS) Version 1.1, OASIS, 2013.
+    - IETF RFC 5424, The Syslog Protocol, 2009.
+    - Open Cloud Mesh (OCM), IETF Internet-Draft.
+    - Web Application Open Platform Interface (WOPI) protocol.
+  govstack:
+    - govstack:spec:cfr, GovStack Cross-Functional Requirements.
+    - govstack:spec, GovStack Specification Framework, including the proposed chapter Functionalities and Extensions (ARCH-ADR-7, ARCH-TDR-1).
+    - govstack:ra:credentials, GovStack Credentials Reference Architecture (not yet published).
+  working_group_sources:
+    - FMS Terms and Functional Components, GovStack Wiki.
+    - FMS Meeting Minutes of 2026-06-01 and 2026-08-31, GovStack Wiki.
+    - First write-up of the File Management Building Block, bb-file-management repository, spec/4-key-digital-functionalities.md.

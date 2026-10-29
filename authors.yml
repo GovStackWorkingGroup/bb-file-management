@@ -1,0 +1,7 @@
+---
+# Should only include the major version's authors
+authors:
+  - name: <Name> # to be completed by the File Management Working Group
+    roles: [Author, Editor, Contributor]
+    urn: govstack:person:<name>
+    url:

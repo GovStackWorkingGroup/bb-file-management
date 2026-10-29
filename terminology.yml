@@ -1,0 +1,94 @@
+---
+- entry:
+    designation: Document
+    description: A unit of recorded information held in the DMS as structured metadata with zero, one or more Files attached. A Document can consist of metadata fields alone.
+- entry:
+    designation: File
+    description: A digital object stored as one unit, made of content and metadata, such as a PDF or an office file.
+- entry:
+    designation: Static File
+    description: A File outside any regulated process and not edited collaboratively. It is stored, retrieved and replaced as a whole.
+- entry:
+    designation: Working Document
+    description: A Document still being created or revised, editable by several users at once without a mandatory process. It is not an official source of truth.
+- entry:
+    designation: Records Document
+    description: |
+      A Document created, received or maintained as evidence of an activity, decision or transaction, in pursuit of legal obligations or in the transaction of business.
+      Note 1: it is created and changed only along a predefined process, and each Version captured during that process is part of its evidence.
+      Note 2: after finalization the content of a Version is never altered; later changes are added as new, traceable Versions through an amendment process.
+      Note 3: "record" is used in the sense of ISO 15489-1, not of ISO 9001, where records are retained information that no longer changes.
+    designated_at: adapted from ISO 15489-1:2016, 3.14
+- entry:
+    designation: in process
+    description: The state of a Records Document while its records process runs. Only the editors assigned to the current step may change it.
+- entry:
+    designation: finalized
+    description: The state of a Records Document once its records process is complete. Its Versions are fixed; only an amendment process can add a new Version.
+- entry:
+    designation: declaration
+    description: The step that turns a Static File or a Working Document into a Records Document, either in process or directly finalized.
+- entry:
+    designation: records process
+    description: A predefined set of steps a Records Document passes through, in series, in parallel or both. Each step has an action (edit, review, approve or sign) and an assignee (a user, a group or a role).
+- entry:
+    designation: process step
+    description: One step of a records process. It stays current until its assignee completes, approves or rejects it.
+- entry:
+    designation: finalization
+    description: The completion of a records process, which moves the Records Document from in process to finalized.
+- entry:
+    designation: amendment process
+    description: A predefined records process that adds a new Version to a finalized Records Document while keeping earlier Versions unchanged and retrievable.
+- entry:
+    designation: document type
+    description: A configured kind of Document with its own typed metadata fields, mandatory fields and default records process, such as "building permit decision".
+- entry:
+    designation: Container
+    description: A grouping of Documents and Files, such as a folder, a team space or a case file, through which they are organised and permissions are inherited.
+- entry:
+    designation: Version
+    description: A stored state of the content of a Document or File. Replacing content creates a new Version under the same identifier.
+- entry:
+    designation: system metadata
+    description: Metadata the DMS maintains itself, such as identifier, size, media type and timestamps.
+- entry:
+    designation: custom metadata
+    description: Metadata a user or service application attaches, such as an application number or a document category.
+- entry:
+    designation: Share
+    description: A grant of access to a Document, File or Container for a user, a group or the holder of a link, with a role and an optional expiry.
+- entry:
+    designation: classification scheme
+    description: A hierarchy of record classes (file plan) that sets retention, access rules and the default records process for the Records Documents in each class.
+- entry:
+    designation: records aggregation
+    description: A group of Records Documents managed as one unit, such as a case file, whose closure can start a retention period.
+- entry:
+    designation: retention schedule
+    description: The rule attached to a record class that sets the retention period, its trigger event and the disposition action.
+- entry:
+    designation: legal hold
+    description: A suspension of disposition for specified Records Documents, for example during litigation.
+- entry:
+    designation: disposition
+    description: The action on a Records Document at the end of its retention period - destruction, transfer to an archive, or review.
+- entry:
+    designation: organisational archive
+    description: An area of the DMS with restricted access that holds finalized Records Documents no longer in active use, before their transfer to a central government archive.
+- entry:
+    designation: transfer package
+    description: A package of Records Documents with their metadata, process history and activity trail, produced for transfer to an archive.
+    designated_at: ISO 14721 (Submission Information Package)
+- entry:
+    designation: automated agent
+    description: Software, such as an AI assistant, that calls the DMS on behalf of a person and with that person's permissions.
+- entry:
+    designation: data subject
+    description: A living person whom personal data in a Document is about; not necessarily its uploader or owner.
+- entry:
+    designation: issued document
+    description: A Records Document issued to a person, such as a permit or a certificate, that a document wallet can refer to at its source.
+- entry:
+    designation: service application
+    description: A government service front end or back end that uses the DMS through its API, such as a construction permit portal.

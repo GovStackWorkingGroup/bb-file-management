@@ -1,0 +1,67 @@
+---
+name: Document Management
+abstract: |
+  The Document Management Building Block keeps the documents and files of government services and
+  administrations under control through their whole life. Every conformant solution stores
+  documents under stable identifiers with their versions and metadata, finds them again and
+  controls who may reach them. Solutions that claim the Working Document Collaboration extension
+  add simultaneous editing; solutions that claim the Records Management extension add records
+  processes, classification, retention, disposition and archival transfer.
+url: https://specs.govstack.global/document-management/
+repository: https://github.com/GovStackWorkingGroup/bb-file-management
+urn: govstack:spec:bb:dms
+owner_group: govstack:wg:dms # to be confirmed: File Management Working Group
+versions:
+  - version: 1.0-draft
+    url_suffix: /document-management/1.0-draft
+    release_date:
+    latest: true
+    short_description: First draft organised by capabilities, functionalities, a core and two extensions.
+
+# Capabilities follow the document lifecycle (capture to preservation), followed by
+# capabilities that apply at every stage. Informative: they carry no requirements.
+capabilities:
+  - id: capture
+    title: Document Capture
+    description: Documents and files from citizens, businesses and officials come under the administration's custody with a stable identity, a version history and the context they belong to.
+  - id: co-authoring
+    title: Collaborative Authoring
+    description: Officials and invited partners draft and revise documents together, without exchanging copies.
+  - id: controlled-processing
+    title: Controlled Processing
+    description: A document that serves as evidence is edited, reviewed, approved and signed only by the people assigned to each step of a predefined process, and is fixed when that process ends.
+  - id: exchange
+    title: Document Exchange
+    description: Documents reach citizens, partners, other administrations and document wallets under the control of the administration that holds them.
+  - id: retention
+    title: Retention and Disposition
+    description: Each record is kept as long as the law requires and no longer, then destroyed or transferred after an authorised decision.
+  - id: preservation
+    title: Long-term Preservation
+    description: Records stay authentic and readable for decades and are handed over to an archive with their context.
+  - id: findability
+    title: Document Findability
+    description: An official or a service finds a document again by its context, its content or the person it concerns.
+  - id: protection
+    title: Access Protection
+    description: Each document is reachable only by the people and services entitled to it, whichever way they reach it.
+  - id: accountability
+    title: Accountability
+    description: Actions on documents can be traced to a person, or to an automated agent acting for one, and a time.
+  - id: integration
+    title: Service Integration
+    description: Government services and process engines act on documents through agreed interfaces and learn when documents change.
+
+extensions:
+  - id: collaboration
+    title: Working Document Collaboration
+    description: Editing Working Documents at the same time in a browser and on synchronised devices, with guests and partner organisations, and seeing who changed what.
+    role:
+    reference_architecture:
+    requires: []
+  - id: records
+    title: Records Management
+    description: Managing Records Documents from declaration through predefined processes, finalization, classification and retention to disposition or archival transfer, with a complete audit trail.
+    role:
+    reference_architecture:
+    requires: []
