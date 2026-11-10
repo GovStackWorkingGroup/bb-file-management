@@ -9,7 +9,7 @@ title: Technical overview
 The Working Group looked at four types of software that governments use, or could use, to manage the documents of their services and administrations.
 
 | Software type | What it does |
-|---|---|---|
+|---|---|
 | File synchronisation and sharing platforms | Storing files with versions, synchronising them to desktop and mobile devices, sharing with named people and through links, simultaneous editing through a connected office editor, federated sharing between institutions |
 | Enterprise content and records management systems | Document types with typed metadata, documents made of metadata alone, workflows with serial and parallel steps, classification and retention, legal holds, detailed audit trails, archival transfer, exchange of documents between administrations |
 | Single-purpose public service applications | Collecting and checking the documents citizens submit for one procedure, deleting them when no longer needed, and telling the account holder apart from the persons the documents concern |
