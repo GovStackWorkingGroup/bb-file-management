@@ -8,12 +8,12 @@ title: Technical overview
 
 The Working Group looked at four types of software that governments use, or could use, to manage the documents of their services and administrations.
 
-| Software type | What it does well | What it lacks for this Building Block |
+| Software type | What it does |
 |---|---|---|
-| File synchronisation and sharing platforms | Storing files with versions, synchronising them to desktop and mobile devices, sharing with named people and through links, simultaneous editing through a connected office editor, federated sharing between institutions | Records management: predefined records processes, classification schemes, retention schedules with approved disposition, archival transfer |
-| Enterprise content and records management systems | Document types with typed metadata, documents made of metadata alone, workflows with serial and parallel steps, classification and retention, legal holds, detailed audit trails, archival transfer, exchange of documents between administrations | Simultaneous editing in the browser, synchronisation clients and editing by guests are limited or depend on add-ons |
-| Single-purpose public service applications | Collecting and checking the documents citizens submit for one procedure, deleting them when no longer needed, and telling the account holder apart from the persons the documents concern | A fixed data model for one procedure: no general Containers, version history, configurable permissions or retention. They are service applications that would use the Building Block rather than candidates for it |
-| Office editors connected to a document store | Simultaneous editing of office documents in the browser | No storage, metadata or permissions of their own; they become part of a Building Block Software only when a software solution relies on them for co-editing |
+| File synchronisation and sharing platforms | Storing files with versions, synchronising them to desktop and mobile devices, sharing with named people and through links, simultaneous editing through a connected office editor, federated sharing between institutions |
+| Enterprise content and records management systems | Document types with typed metadata, documents made of metadata alone, workflows with serial and parallel steps, classification and retention, legal holds, detailed audit trails, archival transfer, exchange of documents between administrations |
+| Single-purpose public service applications | Collecting and checking the documents citizens submit for one procedure, deleting them when no longer needed, and telling the account holder apart from the persons the documents concern |
+| Office editors connected to a document store | Simultaneous editing of office documents in the browser |
 
 The functionalities follow from this comparison:
 
