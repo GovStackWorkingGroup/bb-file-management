@@ -14,13 +14,13 @@ The Document Management Building Block provides capabilities along the whole doc
 
 | Lifecycle stage | Capability | Provided by |
 |---|---|---|
-| Capture | **Document Capture**: documents come under the administration's custody with a stable identity, a version history and their context | Every conformant solution; Records Management adds records capture |
-| Drafting | **Collaborative Authoring**: officials and partners draft and revise documents together | Solutions that claim the Working Document Collaboration extension |
-| Processing | **Controlled Processing**: evidence is edited, reviewed, approved and signed only along a predefined process, and fixed when it ends | Solutions that claim the Records Management extension |
-| Exchange | **Document Exchange**: documents reach citizens, partners, other administrations and document wallets under control | Every conformant solution (sharing); both extensions add to it |
-| Retention | **Retention and Disposition**: records are kept as long as the law requires, then destroyed or transferred after an authorised decision | Solutions that claim the Records Management extension |
-| Preservation | **Long-term Preservation**: records stay authentic and readable for decades and reach the archive with their context | Solutions that claim the Records Management extension |
-| Every stage | **Document Findability**, **Access Protection**, **Accountability** and **Service Integration** | Every conformant solution; both extensions add to Accountability |
+| Capture | **Document Capture**: documents come under the administration's custody with a stable identity, a version history and their context | Every profile; Records Management adds records capture |
+| Drafting | **Collaborative Authoring**: officials and partners draft and revise documents together | Working Document Collaboration profile |
+| Processing | **Controlled Processing**: evidence is edited, reviewed, approved and signed only along a predefined process, and fixed when it ends | Records Management profile |
+| Exchange | **Document Exchange**: documents reach citizens, partners, other administrations and document wallets under control | Every profile (sharing); Working Document Collaboration and Records Management add to it |
+| Retention | **Retention and Disposition**: records are kept as long as the law requires, then destroyed or transferred after an authorised decision | Records Management profile |
+| Preservation | **Long-term Preservation**: records stay authentic and readable for decades and reach the archive with their context | Records Management profile |
+| Every stage | **Document Findability**, **Access Protection**, **Accountability** and **Service Integration** | Every profile; Working Document Collaboration and Records Management add to Accountability |
 
 ```mermaid
 flowchart LR
@@ -41,17 +41,17 @@ flowchart LR
   end
 ```
 
-*Figure 1: capabilities along the document lifecycle. Collaborative Authoring is provided only by solutions that claim the Working Document Collaboration extension; Controlled Processing, Retention and Disposition, and Long-term Preservation only by solutions that claim the Records Management extension.*
+*Figure 1: capabilities along the document lifecycle. Collaborative Authoring is provided only by the Working Document Collaboration profile; Controlled Processing, Retention and Disposition, and Long-term Preservation only by the Records Management profile.*
 
-A common specification matters here for three reasons. The first is **replaceability**: dozens of service applications store their documents in one document management system, and without an agreed interface a government that changes supplier must rewrite all of them, so in practice it never changes supplier. The second is **interoperability**: administrations hand documents to each other, process engines start and steer work on documents, and document wallets refer to issued documents at their source; each of these integrations is built once when every conformant solution behaves alike at its interfaces. The third is **assurance**: a procurement can require the core and name the extensions it needs, and a buyer can compare products against the same statement of what they must do.
+A common specification matters here for three reasons. The first is **replaceability**: dozens of service applications store their documents in one document management system, and without an agreed interface a government that changes supplier must rewrite all of them, so in practice it never changes supplier. The second is **interoperability**: administrations hand documents to each other, process engines start and steer work on documents, and document wallets refer to issued documents at their source; each of these integrations is built once when every conformant software solution behaves alike at its interfaces. The third is **assurance**: a procurement can name the conformance profiles it needs, and a buyer can compare software products against the same statement of what they must do.
 
 ## Place in larger systems
 
-The Document Management Building Block operates within the GovStack Architecture, and every conformant solution meets the GovStack cross-functional requirements.
+The Document Management Building Block operates within the GovStack Architecture, and every conformant software solution meets the GovStack cross-functional requirements.
 
-No Domain Reference Architecture for document and records management exists yet. The Working Group describes the domain context here in the Building Block's own terms, and reports the gap to the Architecture Working Group. Two kinds of process logic surround the Building Block, and both are needed: **intra-system records processes**, which move a document through edit, review, approval and signature steps inside one system and are specified here in the Records Management extension; and **cross-system orchestration**, which moves work between systems and belongs to the Workflow Building Block or another process engine.
+No Domain Reference Architecture for document and records management exists yet. The Working Group describes the domain context here in the Building Block's own terms, and reports the gap to the Architecture Working Group. Two kinds of process logic surround the Building Block, and both are needed: **intra-system records processes**, which move a document through edit, review, approval and signature steps inside one system and are specified here in the Records Management profile; and **cross-system orchestration**, which moves work between systems and belongs to the Workflow Building Block or another process engine.
 
-In the Credentials Reference Architecture (`govstack:ra:credentials`), the Building Block performs no role of its own. It is the authoritative source behind a **Credential Issuer** for issued documents, such as permits and certificates, which a citizen's wallet refers to. The obligations it has in that context are in *Issued Document Access*, part of the Records Management extension.
+In the Credentials Reference Architecture (`govstack:ra:credentials`), the Building Block performs no role of its own. It is the authoritative source behind a **Credential Issuer** for issued documents, such as permits and certificates, which a citizen's wallet refers to. The obligations it has in that context are in *Issued Document Access*, part of the Records Management profile.
 
 The Building Block commonly works with:
 

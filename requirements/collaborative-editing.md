@@ -4,8 +4,6 @@ description: |
   Officials and invited partners draft and revise Working Documents together, at the same time and
   from any device, without exchanging copies by email.
 realises: [co-authoring, exchange]
-conformance: EXTENSION
-extension: collaboration
 requirements:
   # WRK-1 (working label; the number is issued on acceptance)
   - id:
@@ -118,7 +116,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS derives a new Working Document from a Records Document as a copy that references its source record."
     documentation: |
-      Condition: applies when the solution also claims the Records Management extension. The
+      Condition: applies when the software solution also claims the Records Management profile. The
       record itself is not changed.
     api_operation_id:
     test:

@@ -5,8 +5,6 @@ description: |
   or to an automated agent acting for one, and a time, in a trail that cannot be altered
   unnoticed.
 realises: [accountability]
-conformance: EXTENSION
-extension: records
 requirements:
   # ACT-1 (working label; the number is issued on acceptance)
   - id:

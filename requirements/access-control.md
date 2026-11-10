@@ -4,8 +4,6 @@ description: |
   Each document is reachable only by the people and services entitled to it, and the same rules
   hold whichever way it is reached.
 realises: [protection]
-conformance: CORE
-extension:
 requirements:
   # ACC-1 (working label; the number is issued on acceptance)
   - id:

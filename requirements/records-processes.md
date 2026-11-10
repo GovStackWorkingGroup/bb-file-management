@@ -5,8 +5,6 @@ description: |
   assigned to each step of a predefined process, in series or in parallel, and is finalized when
   the last step is completed.
 realises: [controlled-processing]
-conformance: EXTENSION
-extension: records
 requirements:
   # PRC-1 (working label; the number is issued on acceptance)
   - id:

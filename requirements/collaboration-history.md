@@ -3,8 +3,6 @@ title: Collaboration History
 description: |
   Collaborators see who created, changed, moved, shared or deleted a Working Document, and when.
 realises: [accountability, co-authoring]
-conformance: EXTENSION
-extension: collaboration
 requirements:
   # WRK-14 (working label; the number is issued on acceptance)
   - id:

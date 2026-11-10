@@ -5,8 +5,6 @@ description: |
   see it and how long it is kept, and records are destroyed or transferred only after an
   authorised decision.
 realises: [retention, protection]
-conformance: EXTENSION
-extension: records
 requirements:
   # RET-1 (working label; the number is issued on acceptance)
   - id:

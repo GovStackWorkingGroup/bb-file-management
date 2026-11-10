@@ -5,8 +5,6 @@ description: |
   fixed content once finalized, whether they start as an upload, a draft or a set of metadata
   fields.
 realises: [capture, controlled-processing, preservation]
-conformance: EXTENSION
-extension: records
 requirements:
   # REC-1 (working label; the number is issued on acceptance)
   - id:

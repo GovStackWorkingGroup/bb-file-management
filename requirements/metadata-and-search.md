@@ -5,8 +5,6 @@ description: |
   concern, and officials and services find them again by that context, by their content or by the
   person concerned.
 realises: [capture, findability, protection]
-conformance: CORE
-extension:
 requirements:
   # MET-1 (working label; the number is issued on acceptance)
   - id:
@@ -61,8 +59,8 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS validates custom metadata against a configured schema with typed and mandatory fields."
     documentation: |
-      Extends govstack-cfr-data#req-5. Becomes REQUIRED through document types for solutions that
-      claim the Records Management extension (REC-3).
+      Extends govstack-cfr-data#req-5. Becomes REQUIRED through document types for software solutions that
+      claim the Records Management profile (REC-3).
     api_operation_id:
     test:
   # MET-7 (working label; the number is issued on acceptance)

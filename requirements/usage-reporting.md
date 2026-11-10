@@ -4,8 +4,6 @@ description: |
   Administrators and auditors see how the document stock develops and where access was refused, so
   that capacity, housekeeping and security issues are noticed early.
 realises: [accountability]
-conformance: CORE
-extension:
 requirements:
   # RPT-1 (working label; the number is issued on acceptance)
   - id:

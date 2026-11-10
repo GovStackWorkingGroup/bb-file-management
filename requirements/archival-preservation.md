@@ -5,8 +5,6 @@ description: |
   active use ends, and are handed over to the central archive in a standard package with their
   context.
 realises: [preservation]
-conformance: EXTENSION
-extension: records
 requirements:
   # RET-8 (working label; the number is issued on acceptance)
   - id:

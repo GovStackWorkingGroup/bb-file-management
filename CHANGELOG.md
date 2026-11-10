@@ -1,5 +1,17 @@
 # Changelog
 
+## Draft v0.4 (test branch)
+
+- Core and extensions replaced by three conformance profiles: File Management (formerly the core), Working Document Collaboration and Records Management. The latter two include File Management. Their scope is unchanged.
+- `metadata.yml`: `extensions` replaced by `conformance_profiles`, each with `includes` and the list of its functionalities.
+- New folder `conformance-profiles` with one file per profile: why choose it, example use cases, functionalities, actors relevant for testing, interfaces.
+- `introduction/overview.md` renamed `introduction/technical-overview.md` and moved after the scope in `toc.yml`. The chapter *Building Block Software* became *Market assessment*, with the former boundary description as its last section. *Core and extensions* became *Conformance profiles*. The actors and interfaces tables moved to the profile files.
+- Functionalities table: column *Conformance* became *Conformance profiles*.
+- `conformance` and `extension` fields removed from all functionality files.
+- "system under test" replaced by "Building Block Software"; product and solution now always read "software product" and "software solution".
+- `toc.yml`: fixed the entry for `reference-software.md`, which still pointed to `reference-products.md`.
+
+
 ## Draft v3
 
 ### Structure
@@ -75,7 +87,7 @@ Taken from the first write-up in `bb-file-management/spec/4-key-digital-function
 | ACT-9 | Activity records kept at least twelve months |
 | ACT-10 | Identifiers instead of personal data in activity records |
 
-Added by this draft: INT-5 (WebDAV access), because most candidate products offer it and the Service API strategy is open.
+Added by this draft: INT-5 (WebDAV access), because most candidate software products offer it and the Service API strategy is open.
 
 ### Changed wording
 
@@ -92,4 +104,4 @@ Added by this draft: INT-5 (WebDAV access), because most candidate products offe
 | Semantic search and anomaly detection by AI | Not yet stated as verifiable behaviour; MET-16 already keeps content inside the deployment |
 | Scheduled publication and removal on public websites | Belongs to a Content Management System Building Block |
 | SAML and OIDC, AES-256 and TLS 1.3, WCAG 2.1 AA | Inherited from the cross-functional requirements |
-| Two data centres, RPO and RTO, sizing tool | Deployment and hosting concerns, outside the system under test |
+| Two data centres, RPO and RTO, sizing tool | Deployment and hosting concerns, outside the Building Block Software |

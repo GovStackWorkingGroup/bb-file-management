@@ -2,22 +2,26 @@
 toc:
   introduction:
     - purpose.md
-    - overview.md
     - scope.md
+    - technical-overview.md
     - references.yml
     - terminology.yml
+  conformance-profiles:
+    - file-management.md
+    - working-document-collaboration.md
+    - records-management.md
   requirements:
-    # Core
+    # File Management profile
     - document-storage.md
     - metadata-and-search.md
     - access-control.md
     - document-sharing.md
     - integration-and-events.md
     - usage-reporting.md
-    # Working Document Collaboration extension
+    # Working Document Collaboration profile
     - collaborative-editing.md
     - collaboration-history.md
-    # Records Management extension
+    # Records Management profile
     - records-capture.md
     - records-processes.md
     - classification-and-retention.md
@@ -26,5 +30,5 @@ toc:
     - document-exchange.md
     - issued-documents.md
   resources:
-    - reference-products.md
+    - reference-software.md
     - open-questions.md

@@ -5,8 +5,6 @@ description: |
   behind that person's document wallet: requesters fetch it from its source with the person's
   consent, and can check that it is still valid.
 realises: [exchange]
-conformance: EXTENSION
-extension: records
 requirements:
   # DOC-1 (working label; the number is issued on acceptance)
   - id:
@@ -105,7 +103,7 @@ In a document wallet, the person's wallet usually holds a reference to a documen
 
 The DMS of the issuing administration is that source. It never talks to the Wallet Building Block directly: an issuing service sits between them, and a requester gateway creates the grant under which the DMS releases a document (DOC-5).
 
-All requirements are RECOMMENDED for now. Once the Working Group agrees on the REQUIRED ones, this functionality may become an extension of its own that requires Records Management.
+All requirements are RECOMMENDED for now. Once the Working Group agrees on the REQUIRED ones, this functionality may become a conformance profile of its own that includes Records Management.
 
 # Workflows
 

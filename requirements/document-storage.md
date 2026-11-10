@@ -3,10 +3,8 @@ title: Document Storage
 description: |
   Officials, citizens and services hand documents and files to the administration and get them
   back, under an identifier that never changes, with every earlier version kept and nothing lost
-  when a person leaves or the product is replaced.
+  when a person leaves or the software product is replaced.
 realises: [capture]
-conformance: CORE
-extension:
 requirements:
   # STO-1 (working label; the number is issued on acceptance)
   - id:
@@ -99,7 +97,7 @@ requirements:
     interaction: FILE
     statement: "The DMS exports all Files of a Container, with their folder structure, in open and documented formats."
     documentation: |
-      Purpose: documents stay usable if the product is switched off or replaced (exit-first strategy)
+      Purpose: documents stay usable if the software product is switched off or replaced (exit-first strategy)
     api_operation_id:
     test:
   # STO-11 (working label; the number is issued on acceptance)

@@ -4,8 +4,6 @@ description: |
   Administrations send records to each other in an agreed envelope through the Information
   Mediator, and register what they receive, instead of exchanging them by email.
 realises: [exchange]
-conformance: EXTENSION
-extension: records
 requirements:
   # XCH-1 (working label; the number is issued on acceptance)
   - id:

@@ -2,13 +2,13 @@
 title: Reference software
 ---
 
-# Reference products
+# Reference software products
 
-The core is defined based on the commonalities of all products listed below, the Working Document Collaboration extension by sync-and-share products, and the Records Management extension by records management products. No software product has been tested against these statements yet.
+The File Management profile is defined based on the commonalities of all software products listed below, the Working Document Collaboration profile by sync-and-share software products, and the Records Management profile by records management software products. No software product has been tested against these statements yet.
 
-| Part | Reference products | Points to confirm with the vendors |
+| Profile | Reference software products | Points to confirm with the vendors |
 |---|---|---|
-| Core | Nextcloud, OpenCloud, CERNBox, Alfresco, Webware | STO-9 in Nextcloud needs team folders; ACC-4 applies to Alfresco and Webware only for the access channels they offer; STO-10 export format in Alfresco and Webware |
+| File Management | Nextcloud, OpenCloud, CERNBox, Alfresco, Webware | STO-9 in Nextcloud needs team folders; ACC-4 applies to Alfresco and Webware only for the access channels they offer; STO-10 export format in Alfresco and Webware |
 | Working Document Collaboration | Nextcloud, OpenCloud, CERNBox | WRK-14 and WRK-15 (activity history) in CERNBox; WRK-6 guest editing in OpenCloud; Open Cloud Mesh support in OpenCloud before WRK-12 can become REQUIRED |
 | Records Management | Alfresco with Governance Services, Webware | REC-1 declaration in process in Alfresco, which declares records as final; view events in ACT-1 need Alfresco audit configuration; PRC-9, RET-6 and RET-8 in Webware |
 

@@ -4,8 +4,6 @@ description: |
   Documents reach colleagues, citizens and partners in a controlled way: shared with named people,
   handed out or collected through time-limited links, and withdrawn when no longer needed.
 realises: [exchange, protection]
-conformance: CORE
-extension:
 requirements:
   # ACC-8 (working label; the number is issued on acceptance)
   - id:
@@ -80,4 +78,4 @@ Document Sharing covers the ways an item leaves its Container's normal permissio
 
 The links serve citizen-facing cases: a permit handed out for download, or evidence collected from an applicant without a portal account. Where the service application authenticates the citizen and streams the File itself, neither is needed.
 
-Co-editing with external partners and federated sharing between organisations are in the Working Document Collaboration extension.
+Co-editing with external partners and federated sharing between organisations are in the Working Document Collaboration profile.

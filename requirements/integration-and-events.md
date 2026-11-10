@@ -4,8 +4,6 @@ description: |
   Services, process engines and other Building Blocks act on documents through agreed interfaces
   and learn when documents change, without polling.
 realises: [integration]
-conformance: CORE
-extension:
 requirements:
   # INT-1 (working label; the number is issued on acceptance)
   - id:
@@ -75,7 +73,7 @@ The DMS is one component of a larger service system. Two kinds of process logic 
 
 Events carry identifiers, never content (INT-3), so that a subscriber must still pass Access Control to read a document.
 
-INT-5 and INT-6 name standard interfaces that many products already implement, which lowers the cost of integrating an existing product.
+INT-5 and INT-6 name standard interfaces that many software products already implement, which lowers the cost of integrating an existing software product.
 
 # Data structures
 
