@@ -22,14 +22,6 @@ The functionalities follow from this comparison:
 - **What distinguishes records management systems** became the Records Management profile: records capture, records processes, classification and retention, archival preservation, the records audit trail, exchange between administrations and access to issued documents. The profile also takes in obligations from records law and standards, such as ISO 15489-1 and the archiving model discussed in the Working Group.
 - **Single-purpose public service applications** contributed requirements rather than a profile. They showed that documents must be linked to the persons they concern separately from their uploader (MET-11), and that data minimisation can call for automatic deletion (STO-16).
 
-### Boundary of the Building Block Software
-
-The Building Block Software is a software component that stores the documents and files of government services and administrations, keeps their metadata and versions, controls who may reach them and, depending on its conformance profile, supports collaborative editing of Working Documents and the management of Records Documents.
-
-Its boundary includes everything a software solution relies on to provide its functionalities: its API, its web interface, its synchronisation clients and, where co-editing is provided by a connected office editor, that editor as configured with the software solution. It excludes the service applications that use it, process engines that orchestrate work across systems, signature creation and validation services, identity providers, and the central government archive that receives transfer packages.
-
-The Building Block Software is assessed as a black box, through its Service API, its events, the files it produces and its user interface. Some characteristics cannot be observed from outside: whether content leaves the deployment for analysis, whether the activity trail is protected against alteration, and how long activity records are kept. The requirements that cover them are verified by audit.
-
 ## Functionalities
 
 | Functionality | Realises | Conformance profiles | Description | Requirements |
