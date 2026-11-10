@@ -19,7 +19,6 @@ File Management is included in the other two profiles.
 - **Collecting documents without an account.** A social services office sends a citizen an upload-only link to submit missing evidence.
 - **Starting work elsewhere.** A process engine receives an event when a new document arrives and starts the review of the application.
 - **Answering a data subject access request.** An official lists every document that concerns a given person, across cases.
-- **Changing supplier.** A ministry exports all documents of a department with their folder structure in open formats before switching to another Building Block Software.
 
 ## Functionalities
 
