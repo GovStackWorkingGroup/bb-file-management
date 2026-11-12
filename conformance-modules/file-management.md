@@ -1,16 +1,16 @@
 ---
-title: File Management profile
+title: File Management core
 ---
 
-# File Management profile
+# File Management core
 
-## Why choose this profile?
+## Why choose this conformance module?
 
 Choose File Management when government services need one reliable place for the documents they receive and produce. Citizens' supporting documents and the files officials produce are kept under identifiers that never change, with every earlier version, and with the context a service needs to find them again. Each document is reachable only by those entitled to it, can be shared in a controlled way, and other systems learn when it changes.
 
 Because every service integrates with the same interface, a government can replace the Building Block Software without rewriting its services, and can export all documents in open formats if it does.
 
-File Management is included in the other two profiles.
+Every conformant software solution meets the File Management core. The Working Document Collaboration and Records Management extensions add to it without repeating it.
 
 ## Example use cases
 
@@ -22,15 +22,15 @@ File Management is included in the other two profiles.
 
 ## Functionalities
 
-| Functionality | From profile | Requirements | REQUIRED | RECOMMENDED |
-|---|---|---|---|---|
-| [Document Storage](../requirements/document-storage.md) | File Management | 19 | 10 | 9 |
-| [Metadata and Search](../requirements/metadata-and-search.md) | File Management | 17 | 3 | 14 |
-| [Access Control](../requirements/access-control.md) | File Management | 9 | 4 | 5 |
-| [Document Sharing](../requirements/document-sharing.md) | File Management | 7 | 0 | 7 |
-| [Integration and Events](../requirements/integration-and-events.md) | File Management | 6 | 0 | 6 |
-| [Usage Reporting](../requirements/usage-reporting.md) | File Management | 5 | 0 | 5 |
-| **Total** | | **63** | **17** | **46** |
+| Functionality | Requirements | REQUIRED | RECOMMENDED |
+|---|---|---|---|
+| [Document Storage](../requirements/document-storage.md) | 19 | 10 | 9 |
+| [Metadata and Search](../requirements/metadata-and-search.md) | 17 | 3 | 14 |
+| [Access Control](../requirements/access-control.md) | 9 | 4 | 5 |
+| [Document Sharing](../requirements/document-sharing.md) | 7 | 0 | 7 |
+| [Integration and Events](../requirements/integration-and-events.md) | 6 | 0 | 6 |
+| [Usage Reporting](../requirements/usage-reporting.md) | 5 | 0 | 5 |
+| **Total** | **63** | **17** | **46** |
 
 ## Actors relevant for testing
 

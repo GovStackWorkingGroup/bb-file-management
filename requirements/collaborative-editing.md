@@ -116,7 +116,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS derives a new Working Document from a Records Document as a copy that references its source record."
     documentation: |
-      Condition: applies when the software solution also claims the Records Management profile. The
+      Condition: applies when the software solution also claims the Records Management extension. The
       record itself is not changed.
     api_operation_id:
     test:

@@ -1,14 +1,14 @@
 ---
-title: Records Management profile
+title: Records Management extension
 ---
 
-# Records Management profile
+# Records Management extension
 
-## Why choose this profile?
+## Why choose this conformance module?
 
 Choose Records Management when documents are evidence of what the administration decided and did. A record is edited only by the people assigned to each step of a predefined process, is fixed when the process ends, and changes afterwards only by adding traceable versions. It belongs to a class of the organisation's classification scheme, is kept as long as the law requires, and is then destroyed or transferred to an archive after an authorised decision. Every action on it, including who viewed it, is recorded.
 
-The profile includes File Management, so every record is also stored, versioned, findable and protected as in that profile.
+The extension covers records management only. A software solution that claims it also meets the File Management core, which stores, versions, finds and protects every record.
 
 ## Example use cases
 
@@ -21,26 +21,20 @@ The profile includes File Management, so every record is also stored, versioned,
 
 ## Functionalities
 
-| Functionality | From profile | Requirements | REQUIRED | RECOMMENDED |
-|---|---|---|---|---|
-| [Document Storage](../requirements/document-storage.md) | File Management | 19 | 10 | 9 |
-| [Metadata and Search](../requirements/metadata-and-search.md) | File Management | 17 | 3 | 14 |
-| [Access Control](../requirements/access-control.md) | File Management | 9 | 4 | 5 |
-| [Document Sharing](../requirements/document-sharing.md) | File Management | 7 | 0 | 7 |
-| [Integration and Events](../requirements/integration-and-events.md) | File Management | 6 | 0 | 6 |
-| [Usage Reporting](../requirements/usage-reporting.md) | File Management | 5 | 0 | 5 |
-| [Records Capture](../requirements/records-capture.md) | Records Management | 11 | 7 | 4 |
-| [Records Processes](../requirements/records-processes.md) | Records Management | 20 | 10 | 10 |
-| [Classification and Retention](../requirements/classification-and-retention.md) | Records Management | 11 | 7 | 4 |
-| [Archival Preservation](../requirements/archival-preservation.md) | Records Management | 6 | 1 | 5 |
-| [Records Audit Trail](../requirements/records-audit-trail.md) | Records Management | 10 | 1 | 9 |
-| [Inter-agency Document Exchange](../requirements/document-exchange.md) | Records Management | 2 | 0 | 2 |
-| [Issued Document Access](../requirements/issued-documents.md) | Records Management | 9 | 0 | 9 |
-| **Total** | | **132** | **43** | **89** |
+| Functionality | Requirements | REQUIRED | RECOMMENDED |
+|---|---|---|---|
+| [Records Capture](../requirements/records-capture.md) | 11 | 7 | 4 |
+| [Records Processes](../requirements/records-processes.md) | 20 | 10 | 10 |
+| [Classification and Retention](../requirements/classification-and-retention.md) | 11 | 7 | 4 |
+| [Archival Preservation](../requirements/archival-preservation.md) | 6 | 1 | 5 |
+| [Records Audit Trail](../requirements/records-audit-trail.md) | 10 | 1 | 9 |
+| [Inter-agency Document Exchange](../requirements/document-exchange.md) | 2 | 0 | 2 |
+| [Issued Document Access](../requirements/issued-documents.md) | 9 | 0 | 9 |
+| **Total** | **69** | **26** | **43** |
 
 ## Actors relevant for testing
 
-All actors of the File Management profile, plus:
+Testing this extension assumes the software solution meets the File Management core; the actors of the core are described in `file-management.md`.
 
 | Actor | Kind | Role in tests | Functionalities |
 |---|---|---|---|
@@ -52,7 +46,7 @@ All actors of the File Management profile, plus:
 
 ## Interfaces
 
-All interfaces of the File Management profile, plus:
+The interfaces of the File Management core are described in `file-management.md`.
 
 | Interface | Counterpart | Direction | Functionalities | Type | Contract defined in |
 |---|---|---|---|---|---|

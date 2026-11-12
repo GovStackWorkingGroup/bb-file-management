@@ -60,7 +60,7 @@ requirements:
     statement: "The DMS validates custom metadata against a configured schema with typed and mandatory fields."
     documentation: |
       Extends govstack-cfr-data#req-5. Becomes REQUIRED through document types for software solutions that
-      claim the Records Management profile (REC-3).
+      claim the Records Management extension (REC-3).
     api_operation_id:
     test:
   # MET-7 (working label; the number is issued on acceptance)

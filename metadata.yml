@@ -2,21 +2,22 @@
 name: Document Management
 abstract: |
   The Document Management Building Block keeps the documents and files of government services and
-  administrations under control through their whole life. It defines three conformance profiles.
-  File Management stores documents under stable identifiers with their versions and metadata, finds
-  them again and controls who may reach them. Working Document Collaboration adds simultaneous
-  editing. Records Management adds records processes, classification, retention, disposition and
-  archival transfer. Both include File Management.
+  administrations under control through their whole life. It is divided into three conformance
+  modules. The File Management core, which every conformant software solution meets, stores documents
+  under stable identifiers with their versions and metadata, finds them again and controls who may
+  reach them. The Working Document Collaboration extension adds simultaneous editing. The Records
+  Management extension adds records processes, classification, retention, disposition and archival
+  transfer.
 url: https://specs.govstack.global/document-management/
 repository: https://github.com/GovStackWorkingGroup/bb-file-management
 urn: govstack:spec:bb:dms
 owner_group: govstack:wg:dms
 versions:
-  - version: 0.3-draft
-    url_suffix: /document-management/0.3-draft
+  - version: 0.5-draft
+    url_suffix: /document-management/0.5-draft
     release_date:
     latest: true
-    short_description: Test draft organised by capabilities, functionalities and three conformance profiles.
+    short_description: Test draft organised by capabilities, functionalities and three conformance modules (one core, two extensions).
 
 # Capabilities follow the document lifecycle (capture to preservation), followed by
 # capabilities that apply at every stage. Informative: they carry no requirements.
@@ -52,12 +53,12 @@ capabilities:
     title: Service Integration
     description: Government services and process engines act on documents through agreed interfaces and learn when documents change.
 
-conformance_profiles:
+conformance_modules:
   - id: file-management
     title: File Management
+    type: CORE
     description: Storing documents and files under stable identifiers with their versions and metadata, finding them again, controlling who may reach them, sharing them, and notifying other systems when they change.
-    includes: []
-    profile: conformance-profiles/file-management.md
+    page: conformance-modules/file-management.md
     functionalities:
       - document-storage.md
       - metadata-and-search.md
@@ -67,17 +68,17 @@ conformance_profiles:
       - usage-reporting.md
   - id: working-document-collaboration
     title: Working Document Collaboration
+    type: EXTENSION
     description: Editing Working Documents at the same time in a browser and on synchronised devices, with guests and partner organisations, and seeing who changed what.
-    includes: [file-management]
-    profile: conformance-profiles/working-document-collaboration.md
+    page: conformance-modules/working-document-collaboration.md
     functionalities:
       - collaborative-editing.md
       - collaboration-history.md
   - id: records-management
     title: Records Management
+    type: EXTENSION
     description: Managing Records Documents from declaration through predefined processes, finalization, classification and retention to disposition or archival transfer, with a complete audit trail.
-    includes: [file-management]
-    profile: conformance-profiles/records-management.md
+    page: conformance-modules/records-management.md
     functionalities:
       - records-capture.md
       - records-processes.md

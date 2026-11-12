@@ -6,13 +6,12 @@ title: Scope
 
 ## Subject and applicability
 
-This document specifies the Document Management Building Block, a software component that stores the documents and files of government services and administrations, keeps their metadata and versions, controls who may reach them and, depending on its conformance profile, supports collaborative editing of Working Documents and the management of Records Documents.
+This document specifies the Document Management Building Block, a software component that stores the documents and files of government services and administrations, keeps their metadata and versions, controls who may reach them and, when the software solution claims the extensions, supports collaborative editing of Working Documents and the management of Records Documents.
 
 It is applicable to any software solution claiming conformance to `govstack:spec:bb:dms`.
 
-This document defines three conformance profiles. A conformant software solution claims at least the File Management profile, and meets every REQUIRED requirement of each profile it claims. The other two profiles include File Management:
+The specification is divided into three conformance modules: the File Management core and two extensions. A conformant software solution meets the File Management core. It may also claim one or both of these extensions, and meets every requirement of each extension it claims:
 
-- File Management: storing documents and files under stable identifiers with their versions and metadata, finding them again, controlling who may reach them, sharing them, and notifying other systems when they change.
 - Working Document Collaboration: editing Working Documents at the same time in a browser and on synchronised devices, with guests and partner organisations, and seeing who changed what.
 - Records Management: managing Records Documents from declaration through predefined processes, finalization, classification and retention to disposition or archival transfer, with a complete audit trail.
 
@@ -20,11 +19,11 @@ This document defines three conformance profiles. A conformant software solution
 
 This document extends `govstack:spec:cfr`. A conformant software solution meets the requirements of both.
 
-The Document Management Building Block performs no role in a Domain Reference Architecture yet; none exists for document and records management. In `govstack:ra:credentials` it serves as the authoritative source behind a Credential Issuer for issued documents, through *Issued Document Access* in the Records Management profile.
+The Document Management Building Block performs no role in a Domain Reference Architecture yet; none exists for document and records management. In `govstack:ra:credentials` it serves as the authoritative source behind a Credential Issuer for issued documents, through *Issued Document Access* in the Records Management extension.
 
 ## Covered
 
-**File Management**
+**File Management core**
 
 - **Document Storage**: storing Files under stable identifiers, Versions, Containers owned by organisational units, recoverable deletion and export in open formats
 - **Metadata and Search**: system and custom metadata, search by metadata and content, data subject links and erasure
@@ -33,12 +32,12 @@ The Document Management Building Block performs no role in a Domain Reference Ar
 - **Integration and Events**: document events, rules on entering a Container, WebDAV and CMIS access
 - **Usage Reporting**: storage, activity, inactivity and refused-access reports
 
-**Working Document Collaboration** (includes File Management)
+**Working Document Collaboration extension**
 
 - **Collaborative Editing**: creating, co-editing, previewing, synchronising and sharing Working Documents, including federated sharing through Open Cloud Mesh
 - **Collaboration History**: the history of changes to Working Documents shown to their collaborators
 
-**Records Management** (includes File Management)
+**Records Management extension**
 
 - **Records Capture**: declaring records, document types, record states, integrity of finalized Versions, signatures and archival renditions
 - **Records Processes**: predefined edit, review, approve and sign steps in series and in parallel, up to finalization

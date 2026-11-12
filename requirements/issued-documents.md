@@ -103,7 +103,7 @@ In a document wallet, the person's wallet usually holds a reference to a documen
 
 The DMS of the issuing administration is that source. It never talks to the Wallet Building Block directly: an issuing service sits between them, and a requester gateway creates the grant under which the DMS releases a document (DOC-5).
 
-All requirements are RECOMMENDED for now. Once the Working Group agrees on the REQUIRED ones, this functionality may become a conformance profile of its own that includes Records Management.
+All requirements are RECOMMENDED for now. Once the Working Group agrees on the REQUIRED ones, this functionality may become an extension of its own that requires the Records Management extension.
 
 # Workflows
 

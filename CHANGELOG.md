@@ -1,5 +1,16 @@
 # Changelog
 
+## Draft v0.5 (test branch)
+
+- Conformance profiles replaced by conformance modules: the File Management core and the Working Document Collaboration and Records Management extensions.
+- The extensions no longer include the File Management core in their scope, as in v0.3: every conformant software solution meets the core and may claim one or both extensions.
+- Folder `conformance-profiles` renamed `conformance-modules`. The extension pages list only their own functionalities, actors and interfaces, and refer to the core page for the rest. "Why choose this profile?" became "Why choose this conformance module?".
+- `metadata.yml`: `conformance_profiles` replaced by `conformance_modules`, each with a `type` (`CORE` or `EXTENSION`) instead of `includes`. Version set to 0.5-draft.
+- Technical overview: the functionalities table names one conformance module per functionality, and the section *Conformance profiles* became *Conformance modules*.
+- Purpose, scope, requirement documentation, reference software and open questions use core and extension again.
+- Terminology: added conformance module, core and extension.
+
+
 ## Draft v0.4 (test branch)
 
 - Core and extensions replaced by three conformance profiles: File Management (formerly the core), Working Document Collaboration and Records Management. The latter two include File Management. Their scope is unchanged.

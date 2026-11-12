@@ -6,22 +6,22 @@ toc:
     - technical-overview.md
     - references.yml
     - terminology.yml
-  conformance-profiles:
+  conformance-modules:
     - file-management.md
     - working-document-collaboration.md
     - records-management.md
   requirements:
-    # File Management profile
+    # File Management core
     - document-storage.md
     - metadata-and-search.md
     - access-control.md
     - document-sharing.md
     - integration-and-events.md
     - usage-reporting.md
-    # Working Document Collaboration profile
+    # Working Document Collaboration extension
     - collaborative-editing.md
     - collaboration-history.md
-    # Records Management profile
+    # Records Management extension
     - records-capture.md
     - records-processes.md
     - classification-and-retention.md

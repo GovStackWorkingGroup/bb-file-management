@@ -1,4 +1,4 @@
-# Document Management Building Block — specification draft v0.4 (test branch)
+# Document Management Building Block — specification draft v0.5 (test branch)
 
 This branch holds a test variant of the draft of the GovStack Document Management Building Block (working name `govstack:spec:bb:dms`, formerly File Management System). It follows the repository layout of `bb-template` (branch `beta/2.0`) and the model of the Specification Framework as proposed in pull request #1 (*Functionalities and Extensions*, ARCH-ADR-7 and ARCH-TDR-1).
 
@@ -6,10 +6,10 @@ This branch holds a test variant of the draft of the GovStack Document Managemen
 
 This branch deviates from the Specification Framework on purpose, to test an alternative structure:
 
-- **Conformance profiles instead of a core and extensions.** Three profiles: File Management, Working Document Collaboration and Records Management. The second and third include File Management. They are declared in `metadata.yml` under `conformance_profiles` and described in the folder `conformance-profiles`.
-- **No `conformance` and `extension` fields** in the functionality files. Which functionalities belong to a profile is stated in `metadata.yml` and in each profile file.
-- **`technical-overview.md` instead of `overview.md`**, read after the scope. It starts with a market assessment instead of the Building Block Software; actors and interfaces moved to the profile files.
-- **"Building Block Software"** replaces "system under test", and the words product and solution always appear as "software product" and "software solution".
+- **Conformance modules.** The specification is divided into three conformance modules: the File Management core and two extensions, Working Document Collaboration and Records Management. Every conformant software solution meets the core; the extensions add to it without repeating it. The modules are declared in `metadata.yml` under `conformance_modules` and described in the folder `conformance-modules`.
+- **No `conformance` and `extension` fields** in the functionality files. Which functionalities belong to a conformance module is stated in `metadata.yml` and on each module page.
+- **`technical-overview.md` instead of `overview.md`**, read after the scope. It starts with a market assessment; actors and interfaces are on the module pages.
+- **"Building Block Software"** replaces the framework's term for the software being assessed, and the words product and solution always appear as "software product" and "software solution".
 
 ## What is where
 
@@ -17,35 +17,35 @@ This branch deviates from the Specification Framework on purpose, to test an alt
 .
 ├── README.md
 ├── CHANGELOG.md
-├── metadata.yml                  # name, URN, capabilities, conformance profiles
+├── metadata.yml                  # name, URN, capabilities, conformance modules
 ├── authors.yml
 ├── toc.yml
 ├── introduction
 │   ├── purpose.md                # Value, capabilities, place in larger systems
 │   ├── scope.md                  # Subject, conformance, relationships, covered, not covered
-│   ├── technical-overview.md     # Market assessment, functionalities, conformance profiles
+│   ├── technical-overview.md     # Market assessment, functionalities, conformance modules
 │   ├── references.yml
 │   └── terminology.yml
-├── conformance-profiles          # why choose it, use cases, functionalities, actors, interfaces
+├── conformance-modules           # why choose it, use cases, functionalities, actors, interfaces
 │   ├── file-management.md
 │   ├── working-document-collaboration.md
 │   └── records-management.md
 ├── requirements                  # one file per functionality; requirements in the YAML front matter
-│   ├── document-storage.md               # File Management
-│   ├── metadata-and-search.md            # File Management
-│   ├── access-control.md                 # File Management
-│   ├── document-sharing.md               # File Management
-│   ├── integration-and-events.md         # File Management
-│   ├── usage-reporting.md                # File Management
-│   ├── collaborative-editing.md          # Working Document Collaboration
-│   ├── collaboration-history.md          # Working Document Collaboration
-│   ├── records-capture.md                # Records Management
-│   ├── records-processes.md              # Records Management
-│   ├── classification-and-retention.md   # Records Management
-│   ├── archival-preservation.md          # Records Management
-│   ├── records-audit-trail.md            # Records Management
-│   ├── document-exchange.md              # Records Management
-│   └── issued-documents.md               # Records Management
+│   ├── document-storage.md               # File Management core
+│   ├── metadata-and-search.md            # File Management core
+│   ├── access-control.md                 # File Management core
+│   ├── document-sharing.md               # File Management core
+│   ├── integration-and-events.md         # File Management core
+│   ├── usage-reporting.md                # File Management core
+│   ├── collaborative-editing.md          # Working Document Collaboration extension
+│   ├── collaboration-history.md          # Working Document Collaboration extension
+│   ├── records-capture.md                # Records Management extension
+│   ├── records-processes.md              # Records Management extension
+│   ├── classification-and-retention.md   # Records Management extension
+│   ├── archival-preservation.md          # Records Management extension
+│   ├── records-audit-trail.md            # Records Management extension
+│   ├── document-exchange.md              # Records Management extension
+│   └── issued-documents.md               # Records Management extension
 └── resources
     ├── reference-software.md
     └── open-questions.md
@@ -53,11 +53,11 @@ This branch deviates from the Specification Framework on purpose, to test an alt
 
 ## In numbers
 
-| Profile | Own functionalities | REQUIRED | RECOMMENDED | Including File Management |
+| Conformance module | Type | Functionalities | REQUIRED | RECOMMENDED |
 |---|---|---|---|---|
-| File Management | 6 | 17 | 46 | – |
-| Working Document Collaboration | 2 | 7 | 8 | 24 REQUIRED, 54 RECOMMENDED |
-| Records Management | 7 | 26 | 43 | 43 REQUIRED, 89 RECOMMENDED |
+| File Management | Core | 6 | 17 | 46 |
+| Working Document Collaboration | Extension | 2 | 7 | 8 |
+| Records Management | Extension | 7 | 26 | 43 |
 
 ## Conventions
 

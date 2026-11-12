@@ -92,3 +92,12 @@
 - entry:
     designation: service application
     description: A government service front end or back end that uses the DMS through its API, such as a construction permit portal.
+- entry:
+    designation: conformance module
+    description: A named part of this specification that a software solution claims as a whole. The specification has three - the File Management core and two extensions.
+- entry:
+    designation: core
+    description: The conformance module every conformant software solution meets. In this specification it is File Management.
+- entry:
+    designation: extension
+    description: A conformance module a software solution may claim in addition to the core, here Working Document Collaboration or Records Management. A software solution that claims an extension meets every REQUIRED requirement of it. An extension does not repeat the core.

@@ -78,4 +78,4 @@ Document Sharing covers the ways an item leaves its Container's normal permissio
 
 The links serve citizen-facing cases: a permit handed out for download, or evidence collected from an applicant without a portal account. Where the service application authenticates the citizen and streams the File itself, neither is needed.
 
-Co-editing with external partners and federated sharing between organisations are in the Working Document Collaboration profile.
+Co-editing with external partners and federated sharing between organisations are in the Working Document Collaboration extension.

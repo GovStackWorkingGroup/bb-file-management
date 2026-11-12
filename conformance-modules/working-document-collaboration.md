@@ -1,14 +1,14 @@
 ---
-title: Working Document Collaboration profile
+title: Working Document Collaboration extension
 ---
 
-# Working Document Collaboration profile
+# Working Document Collaboration extension
 
-## Why choose this profile?
+## Why choose this conformance module?
 
 Choose Working Document Collaboration when officials and their partners draft and revise documents together. Several people edit the same document at the same time in the browser or on synchronised devices, invite guests and partner organisations without exchanging copies by email, and can always see who changed what.
 
-The profile includes File Management, so every document worked on together is also stored, versioned, findable and protected as in that profile.
+The extension covers collaboration only. A software solution that claims it also meets the File Management core, which stores, versions, finds and protects the documents worked on together.
 
 ## Example use cases
 
@@ -20,21 +20,15 @@ The profile includes File Management, so every document worked on together is al
 
 ## Functionalities
 
-| Functionality | From profile | Requirements | REQUIRED | RECOMMENDED |
-|---|---|---|---|---|
-| [Document Storage](../requirements/document-storage.md) | File Management | 19 | 10 | 9 |
-| [Metadata and Search](../requirements/metadata-and-search.md) | File Management | 17 | 3 | 14 |
-| [Access Control](../requirements/access-control.md) | File Management | 9 | 4 | 5 |
-| [Document Sharing](../requirements/document-sharing.md) | File Management | 7 | 0 | 7 |
-| [Integration and Events](../requirements/integration-and-events.md) | File Management | 6 | 0 | 6 |
-| [Usage Reporting](../requirements/usage-reporting.md) | File Management | 5 | 0 | 5 |
-| [Collaborative Editing](../requirements/collaborative-editing.md) | Working Document Collaboration | 12 | 5 | 7 |
-| [Collaboration History](../requirements/collaboration-history.md) | Working Document Collaboration | 3 | 2 | 1 |
-| **Total** | | **78** | **24** | **54** |
+| Functionality | Requirements | REQUIRED | RECOMMENDED |
+|---|---|---|---|
+| [Collaborative Editing](../requirements/collaborative-editing.md) | 12 | 5 | 7 |
+| [Collaboration History](../requirements/collaboration-history.md) | 3 | 2 | 1 |
+| **Total** | **15** | **7** | **8** |
 
 ## Actors relevant for testing
 
-All actors of the File Management profile, plus:
+Testing this extension assumes the software solution meets the File Management core; the actors of the core are described in `file-management.md`.
 
 | Actor | Kind | Role in tests | Functionalities |
 |---|---|---|---|
@@ -44,7 +38,7 @@ All actors of the File Management profile, plus:
 
 ## Interfaces
 
-All interfaces of the File Management profile, plus:
+The interfaces of the File Management core are described in `file-management.md`.
 
 | Interface | Counterpart | Direction | Functionalities | Type | Contract defined in |
 |---|---|---|---|---|---|
