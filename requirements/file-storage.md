@@ -243,7 +243,7 @@ Deletion is reversible for a configured period. Records Documents follow the str
 sequenceDiagram
   participant S as Service application
   participant D as DMS
-  S->>D: Create Container for case 2026-0412 (STO-4)
+  S->>D: Create Container for case (STO-4)
   D-->>S: Container identifier
   S->>D: Upload site photo into the Container (STO-1)
   D-->>S: File identifier, Version 1
