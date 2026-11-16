@@ -12,4 +12,6 @@ The File Management core is defined based on the commonalities of all software p
 | Working Document Collaboration extension | Nextcloud, OpenCloud, CERNBox | WRK-14 and WRK-15 (activity history) in CERNBox; WRK-6 guest editing in OpenCloud; Open Cloud Mesh support in OpenCloud before WRK-12 can become REQUIRED |
 | Records Management extension | Alfresco with Governance Services, Webware | REC-1 declaration in process in Alfresco, which declares records as final; view events in ACT-1 need Alfresco audit configuration; PRC-9, RET-6 and RET-8 in Webware |
 
+Alfresco also offers the OASIS Content Management Interoperability Services (CMIS) 1.1, which this specification names here and no longer requires (formerly INT-6).
+
 Nextcloud and OpenCloud are not expected to claim Records Management: OpenCloud described lifecycle management as outside its core scope and is adding only basic retention cleanup (2026-08-31). Alfresco and Webware are not expected to claim Working Document Collaboration, although both offer some collaboration features.

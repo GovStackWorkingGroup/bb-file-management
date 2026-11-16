@@ -12,10 +12,10 @@ toc:
     - records-management.md
   requirements:
     # File Management core
-    - document-storage.md
+    - file-storage.md
     - metadata-and-search.md
     - access-control.md
-    - document-sharing.md
+    - file-sharing.md
     - integration-and-events.md
     - usage-reporting.md
     # Working Document Collaboration extension

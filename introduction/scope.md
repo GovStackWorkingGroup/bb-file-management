@@ -25,12 +25,12 @@ The Document Management Building Block performs no role in a Domain Reference Ar
 
 **File Management core**
 
-- **Document Storage**: storing Files under stable identifiers, Versions, Containers owned by organisational units, recoverable deletion and export in open formats
+- **File Storage**: storing Files under stable identifiers, Versions, Containers owned by organisational units, recoverable deletion and export as a documented package
 - **Metadata and Search**: system and custom metadata, search by metadata and content, data subject links and erasure
-- **Access Control**: permissions for users, groups, organisational roles and attributes, applied the same way on every access channel
-- **Document Sharing**: shares with named users, external collaborators and through upload and download links, and redacted copies
-- **Integration and Events**: document events, rules on entering a Container, WebDAV and CMIS access
-- **Usage Reporting**: storage, activity, inactivity and refused-access reports
+- **Access Control**: permissions for users, groups, service identities and organisational roles, applied the same way on every access channel, and a sensitivity classification
+- **File Sharing**: download and upload links, their revocation, and redacted copies
+- **Integration and Events**: File events, rules on entering a Container, WebDAV access
+- **Usage Reporting**: storage, activity and refused-access reports
 
 **Working Document Collaboration extension**
 

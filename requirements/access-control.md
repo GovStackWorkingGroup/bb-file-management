@@ -11,7 +11,9 @@ requirements:
     level: REQUIRED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS grants read, write, delete and share permissions on a Document, File or Container to individual users and to groups."
+    statement: "The DMS grants and revokes read, write, delete and share permissions on a File or Container for individual users, groups and service identities."
+    documentation: |
+      A software solution MAY let a grant carry an expiry date. A grant to a named user or group replaces the named share in a viewer or editor role (formerly ACC-12).
     api_operation_id:
     test:
   # ACC-2 (working label; the number is issued on acceptance)
@@ -20,7 +22,7 @@ requirements:
     level: REQUIRED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS applies the permissions of a Container to the items and Containers inside it."
+    statement: "The DMS applies the permissions of a Container to the items inside it."
     api_operation_id:
     test:
   # ACC-3 (working label; the number is issued on acceptance)
@@ -29,7 +31,7 @@ requirements:
     level: REQUIRED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS lists which user or group holds which permission on an item or Container, to a caller with share permission."
+    statement: "The DMS lists which user, group or service identity holds which permission on an item, to a caller with share permission."
     api_operation_id:
     test:
   # ACC-4 (working label; the number is issued on acceptance)
@@ -38,7 +40,9 @@ requirements:
     level: REQUIRED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS applies the same permissions to an item in its web interface, its API, its search results, WebDAV access and synchronisation clients."
+    statement: "The DMS applies the same permissions to an item on every access channel the software solution offers."
+    documentation: |
+      Access channels include the API, search results, events, exports, share pages, the web interface, WebDAV and synchronisation clients.
     api_operation_id:
     test:
   # ACC-5 (working label; the number is issued on acceptance)
@@ -65,16 +69,7 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS grants permissions by organisational unit and role, such as manager or employee, taken from the organisation's structure."
-    api_operation_id:
-    test:
-  # ACC-14 (working label; the number is issued on acceptance)
-  - id:
-    status: DRAFT
-    level: RECOMMENDED
-    observability: OBSERVABLE
-    interaction: SERVICE_API
-    statement: "The DMS grants access to an item based on attributes of the person and of the item, such as the person's department and the item's security classification."
+    statement: "The DMS grants permissions by organisational unit and by role."
     api_operation_id:
     test:
   # ACC-15 (working label; the number is issued on acceptance)
@@ -83,19 +78,38 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS lets a designated user override access rules in an emergency only after that user enters a reason, and records each override with the reason."
+    statement: "The DMS lets a user with override permission override the access rules on one item for a limited time after that user enters a reason."
     documentation: |
       Condition: applies where national rules allow emergency access.
+      Constraint: the override is logged with its reason, and the managers of the Container are notified.
+    api_operation_id:
+    test:
+  # ACC-17 (working label; the number is issued on acceptance)
+  - id:
+    status: DRAFT
+    level: RECOMMENDED
+    observability: OBSERVABLE
+    interaction: SERVICE_API
+    statement: "The DMS applies the permissions of the new Container to a moved item and keeps the permissions granted on the item itself."
+    api_operation_id:
+    test:
+  # ACC-18 (working label; the number is issued on acceptance)
+  - id:
+    status: DRAFT
+    level: RECOMMENDED
+    observability: OBSERVABLE
+    interaction: SERVICE_API
+    statement: "The DMS stores a sensitivity classification on each File and Container and returns it with their metadata."
+    documentation: |
+      Constraint: the levels follow govstack-cfr-data#req-13, which asks for at least public, internal and confidential.
     api_operation_id:
     test:
 ---
 
 # Description
 
-Access Control decides who may read, change, delete or share an item. Permissions are granted to users and groups (ACC-1), inherited from Containers (ACC-2) and visible to those who manage them (ACC-3). The same rules apply on every channel the software solution offers (ACC-4), so that a document hidden in the web interface cannot be found through search or a synchronisation client.
+Access Control decides who may read, change, delete or share an item. Permissions are granted to users, groups and service identities and can be revoked (ACC-1). They are inherited from Containers (ACC-2) and visible to those who manage them (ACC-3). The same rules apply on every channel the software solution offers (ACC-4), so that a document hidden in the web interface cannot be found through search or a synchronisation client.
 
 Authentication, token handling and transport security are inherited from govstack-cfr-security and are not restated here.
 
-The RECOMMENDED requirements add finer models: restrictions below the inherited level (ACC-5), organisational roles (ACC-7), attribute-based rules such as clearance levels (ACC-14) and a recorded emergency override (ACC-15). ACC-6 keeps callers from learning which items exist by probing identifiers.
-
-Sharing with named people and links is in *Document Sharing*. Records Documents add class-based access rules in *Classification and Retention*.
+A grant to a named user or group is how a document is shared inside the organisation. Links and redacted copies are in *File Sharing*. Records Documents add class-based access rules in *Classification and Retention*.

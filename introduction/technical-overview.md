@@ -20,16 +20,16 @@ The functionalities follow from this comparison:
 - **What every document store has in common** became the File Management core: storing files under stable identifiers with versions, metadata and search, permissions, sharing, integration and reporting. Software products of the first two types can meet it.
 - **What distinguishes file synchronisation and sharing platforms** became the Working Document Collaboration extension: collaborative editing and its history.
 - **What distinguishes records management systems** became the Records Management extension: records capture, records processes, classification and retention, archival preservation, the records audit trail, exchange between administrations and access to issued documents. The extension also takes in obligations from records law and standards, such as ISO 15489-1 and the archiving model discussed in the Working Group.
-- **Single-purpose public service applications** contributed requirements rather than a conformance module. They showed that documents must be linked to the persons they concern separately from their uploader (MET-11), and that data minimisation can call for automatic deletion (STO-16).
+- **Single-purpose public service applications** contributed requirements rather than a conformance module. They showed that documents must be linked to the persons they concern separately from their uploader (MET-11, MET-19), and that data minimisation can call for automatic deletion (STO-16).
 
 ## Functionalities
 
 | Functionality | Realises | Conformance module | Description | Requirements |
 |---|---|---|---|---|
-| Document Storage | Document Capture | File Management core | Officials, citizens and services hand documents and files to the administration and get them back, under an identifier that never changes, with every earlier version kept and nothing lost when a person leaves or the software product is replaced. | `requirements/document-storage.md` |
+| File Storage | Document Capture | File Management core | Officials, citizens and services hand documents and files to the administration and get them back, under an identifier that never changes, with its earlier versions kept and nothing lost when a person leaves or the software product is replaced. | `requirements/file-storage.md` |
 | Metadata and Search | Document Capture, Document Findability, Access Protection | File Management core | Documents carry the context a service needs, such as the case they belong to or the person they concern, and officials and services find them again by that context, by their content or by the person concerned. | `requirements/metadata-and-search.md` |
 | Access Control | Access Protection | File Management core | Each document is reachable only by the people and services entitled to it, and the same rules hold whichever way it is reached. | `requirements/access-control.md` |
-| Document Sharing | Document Exchange, Access Protection | File Management core | Documents reach colleagues, citizens and partners in a controlled way: shared with named people, handed out or collected through time-limited links, and withdrawn when no longer needed. | `requirements/document-sharing.md` |
+| File Sharing | Document Exchange, Access Protection | File Management core | Documents reach citizens and partners in a controlled way: handed out or collected through links, withdrawn when no longer needed, and released as redacted copies. | `requirements/file-sharing.md` |
 | Integration and Events | Service Integration | File Management core | Services, process engines and other Building Blocks act on documents through agreed interfaces and learn when documents change, without polling. | `requirements/integration-and-events.md` |
 | Usage Reporting | Accountability | File Management core | Administrators and auditors see how the document stock develops and where access was refused, so that capacity, housekeeping and security issues are noticed early. | `requirements/usage-reporting.md` |
 | Collaborative Editing | Collaborative Authoring, Document Exchange | Working Document Collaboration extension | Officials and invited partners draft and revise Working Documents together, at the same time and from any device, without exchanging copies by email. | `requirements/collaborative-editing.md` |
@@ -42,7 +42,7 @@ The functionalities follow from this comparison:
 | Inter-agency Document Exchange | Document Exchange | Records Management extension | Administrations send records to each other in an agreed envelope through the Information Mediator, and register what they receive, instead of exchanging them by email. | `requirements/document-exchange.md` |
 | Issued Document Access | Document Exchange | Records Management extension | A record issued to a person, such as a permit or a certificate, becomes the authoritative source behind that person's document wallet: requesters fetch it from its source with the person's consent, and can check that it is still valid. | `requirements/issued-documents.md` |
 
-Capabilities are divided among the functionalities as follows. **Document Capture** rests on Document Storage and Metadata and Search in the File Management core, and on Records Capture when a document becomes evidence. **Document Findability** is Metadata and Search. **Access Protection** is Access Control, with Document Sharing deciding how items leave their normal permissions, and Classification and Retention adding rules per record class. **Document Exchange** starts with Document Sharing in the File Management core; the Working Document Collaboration extension adds guest editing and federated sharing, and the Records Management extension adds exchange between administrations and access to issued documents for document wallets. **Accountability** is Usage Reporting in the File Management core, Collaboration History for Working Documents and the Records Audit Trail for Records Documents. **Service Integration** is Integration and Events. The other four capabilities are provided only by the two extensions.
+Capabilities are divided among the functionalities as follows. **Document Capture** rests on File Storage and Metadata and Search in the File Management core, and on Records Capture when a document becomes evidence. **Document Findability** is Metadata and Search. **Access Protection** is Access Control, with File Sharing deciding how items leave their normal permissions, and Classification and Retention adding rules per record class. **Document Exchange** starts with File Sharing in the File Management core; the Working Document Collaboration extension adds guest editing and federated sharing, and the Records Management extension adds exchange between administrations and access to issued documents for document wallets. **Accountability** is Usage Reporting in the File Management core, Collaboration History for Working Documents and the Records Audit Trail for Records Documents. **Service Integration** is Integration and Events. The other four capabilities are provided only by the two extensions.
 
 Functionalities a reader might expect but that are placed elsewhere: orchestrating processes across systems (Workflow Building Block), creating and validating electronic signatures (e-Signature Building Block), generating documents from data (the service application), publishing documents on public websites (a Content Management System Building Block), holding credentials for citizens (Wallet Building Block), and operating the central government archive (the adopting government). See the scope for their owners.
 
@@ -52,7 +52,7 @@ The specification is divided into three conformance modules: one core and two ex
 
 | Conformance module | Type | Functionalities | Suited to |
 |---|---|---|---|
-| File Management | Core | Document Storage, Metadata and Search, Access Control, Document Sharing, Integration and Events, Usage Reporting | Every conformant software solution: it keeps the supporting documents and produced files of government services, finds them again and protects them |
+| File Management | Core | File Storage, Metadata and Search, Access Control, File Sharing, Integration and Events, Usage Reporting | Every conformant software solution: it keeps the supporting documents and produced files of government services, finds them again and protects them |
 | Working Document Collaboration | Extension | Collaborative Editing, Collaboration History | Software solutions where officials and partners draft documents together |
 | Records Management | Extension | Records Capture, Records Processes, Classification and Retention, Archival Preservation, Records Audit Trail, Inter-agency Document Exchange, Issued Document Access | Software solutions that manage documents as evidence, from guided editing to retention and archiving |
 
@@ -74,10 +74,10 @@ flowchart LR
   subgraph SUT["Document Management Building Block Software"]
     direction TB
     subgraph FM["File Management core"]
-      Storage["Document Storage"]
+      Storage["File Storage"]
       Meta["Metadata and Search"]
       Access["Access Control"]
-      Share["Document Sharing"]
+      Share["File Sharing"]
       Integ["Integration and Events"]
       Report["Usage Reporting"]
     end

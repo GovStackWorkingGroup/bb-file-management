@@ -140,7 +140,7 @@ sequenceDiagram
   participant D as DMS
   participant B as Official B
   A->>D: Create Working Document from template (WRK-7)
-  A->>D: Share with B as editor (ACC-12)
+  A->>D: Grant B write permission (ACC-1)
   A->>D: Edit in browser
   B->>D: Edit in browser at the same time (WRK-2)
   D-->>D: Save result as new Version (WRK-3)

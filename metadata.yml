@@ -60,10 +60,10 @@ conformance_modules:
     description: Storing documents and files under stable identifiers with their versions and metadata, finding them again, controlling who may reach them, sharing them, and notifying other systems when they change.
     page: conformance-modules/file-management.md
     functionalities:
-      - document-storage.md
+      - file-storage.md
       - metadata-and-search.md
       - access-control.md
-      - document-sharing.md
+      - file-sharing.md
       - integration-and-events.md
       - usage-reporting.md
   - id: working-document-collaboration

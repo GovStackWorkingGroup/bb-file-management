@@ -105,6 +105,17 @@ requirements:
     statement: "The DMS saves each edit made in a step as a new Version that names the step and the editor."
     api_operation_id:
     test:
+  # STO-17 (working label; the number is issued on acceptance)
+  - id:
+    status: DRAFT
+    level: RECOMMENDED
+    observability: OBSERVABLE
+    interaction: SERVICE_API
+    statement: "The DMS labels each Version as a major or a minor Version."
+    documentation: |
+      Moved from *File Storage* in the File Management core.
+    api_operation_id:
+    test:
   # PRC-12 (working label; the number is issued on acceptance)
   - id:
     status: DRAFT
@@ -141,6 +152,7 @@ requirements:
     statement: "The DMS notifies registered subscribers by webhook when a Records Document is declared, moves to another step, is finalized, is amended or is disposed of."
     documentation: |
       Extends INT-1.
+      Subscriptions to these events are also filtered by document type (moved from INT-2).
     api_operation_id:
     test:
   # PRC-16 (working label; the number is issued on acceptance)

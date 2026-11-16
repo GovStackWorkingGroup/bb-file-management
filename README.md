@@ -31,10 +31,10 @@ This branch deviates from the Specification Framework on purpose, to test an alt
 │   ├── working-document-collaboration.md
 │   └── records-management.md
 ├── requirements                  # one file per functionality; requirements in the YAML front matter
-│   ├── document-storage.md               # File Management core
+│   ├── file-storage.md               # File Management core
 │   ├── metadata-and-search.md            # File Management core
 │   ├── access-control.md                 # File Management core
-│   ├── document-sharing.md               # File Management core
+│   ├── file-sharing.md               # File Management core
 │   ├── integration-and-events.md         # File Management core
 │   ├── usage-reporting.md                # File Management core
 │   ├── collaborative-editing.md          # Working Document Collaboration extension
@@ -55,9 +55,9 @@ This branch deviates from the Specification Framework on purpose, to test an alt
 
 | Conformance module | Type | Functionalities | REQUIRED | RECOMMENDED |
 |---|---|---|---|---|
-| File Management | Core | 6 | 17 | 46 |
+| File Management | Core | 6 | 20 | 44 |
 | Working Document Collaboration | Extension | 2 | 7 | 8 |
-| Records Management | Extension | 7 | 26 | 43 |
+| Records Management | Extension | 7 | 26 | 45 |
 
 ## Conventions
 

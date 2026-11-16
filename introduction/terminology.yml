@@ -1,7 +1,9 @@
 ---
 - entry:
     designation: Document
-    description: A unit of recorded information held in the DMS as structured metadata with zero, one or more Files attached. A Document can consist of metadata fields alone.
+    description: |
+      A unit of recorded information held in the DMS as structured metadata with zero, one or more Files attached. A Document can consist of metadata fields alone.
+      Note: only the capitalised term has this meaning. The File Management core manages Files and Containers; Documents enter with the Records Management extension. In lowercase, "document" has its everyday sense and includes a File.
 - entry:
     designation: File
     description: A digital object stored as one unit, made of content and metadata, such as a PDF or an office file.
@@ -58,6 +60,29 @@
 - entry:
     designation: Share
     description: A grant of access to a Document, File or Container for a user, a group or the holder of a link, with a role and an optional expiry.
+- entry:
+    designation: item
+    description: A File or a Container.
+- entry:
+    designation: caller
+    description: Any principal that calls the Service API under its own identity - a user, a service application or an automated agent.
+- entry:
+    designation: user
+    description: A person with an account that the DMS knows.
+- entry:
+    designation: recipient
+    description: A person who holds a link to a File or Container and needs no account to use it.
+- entry:
+    designation: manager
+    description: A user who administers a Container for the organisational unit or group it is assigned to. A manager grants and revokes permissions on the Container and restores, protects and purges its contents.
+- entry:
+    designation: share permission
+    description: The permission to grant and revoke permissions on an item and to create Shares for it.
+- entry:
+    designation: expiry period
+    description: |
+      A period configured for a Container, counted from the creation of a File, after which the DMS deletes the File automatically.
+      Note: it serves data minimisation. It is not the retention period of a retention schedule, which says how long a Records Document must be kept.
 - entry:
     designation: classification scheme
     description: A hierarchy of record classes (file plan) that sets retention, access rules and the default records process for the Records Documents in each class.

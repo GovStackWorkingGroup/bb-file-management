@@ -12,6 +12,7 @@ title: Open questions
 
 ## Content
 
+- [ ] Identifier scope (STO-1): is the identifier unique within the deployment and never reassigned, and does every File sit in a Container, as STO-9 and STO-10 assume? Parked for the Working Group in the review of the File Management core.
 - [ ] Service API strategy: define a GovStack REST API that candidates reach through adapters, or adopt a WebDAV profile for the File Management core (INT-5)?
 - [ ] Process cancellation: when a records process is cancelled, does the Document return to Working Document, stay a Records Document in process, or become a finalized record of the cancelled attempt?
 - [ ] Amendment model: does amending a record add a new Version to the same record (REC-6 as drafted), or create a new record that supersedes and links to the old one?

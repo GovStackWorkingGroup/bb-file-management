@@ -1,5 +1,50 @@
 # Changelog
 
+## Draft v0.5, second review of the File Management core
+
+Applies the decisions of the second review, which looked for statements that can go, and renames two functionalities.
+
+- Functionalities renamed: Document Storage is now File Storage (`requirements/file-storage.md`) and Document Sharing is now File Sharing (`requirements/file-sharing.md`), because the core manages Files and Containers. The interface *Document events* is now *File events*. Capability names and the name of the Building Block are unchanged.
+- Terminology: the entry *Document* notes that only the capitalised term is the defined one.
+
+| Change | Labels |
+|---|---|
+| Removed | ACC-14 (attribute-based access), RPT-3 (inactive Files) |
+| Turned into a Constraint of STO-6 | STO-21 (Version removal), which thereby becomes part of a REQUIRED requirement |
+| Clause removed because a cross-functional requirement already states it | STO-8 (deletion record, govstack-cfr-data#req-7), MET-6 (error naming the field, govstack-cfr-data#req-5), MET-19 and ACC-15 (logging, govstack-cfr-security#req-3), ACC-7 (identity provider, govstack-cfr-security#req-3), MET-1 and INT-3 (UTC, govstack-cfr-data#req-2) |
+| Clause removed because ACC-4 already states it | MET-3, INT-2 |
+| One interaction type per requirement | INT-1 keeps event delivery, with retry as a Constraint; INT-2 now registers subscriptions through the API; ACC-9 is of type USER_INTERFACE |
+
+- Module page: the actor and the interface *Identity provider* are removed, because identity is inherited from the cross-functional requirements.
+- *Data structures* of File Storage no longer repeats the fields of a File; they are listed in *Metadata and Search*.
+- Descriptions of File Storage, Metadata and Search, Access Control and Usage Reporting no longer list the requirements label by label.
+- The File Management core now has 64 requirements, 20 REQUIRED and 44 RECOMMENDED (after the first review: 67, 20 and 47).
+
+## Draft v0.5, review of the File Management core
+
+Applies the decisions of the per-requirement review of the File Management core. The extensions change only where a requirement moved into them.
+
+- The core knows Files and Containers only. Statements say File; *item* is defined as a File or a Container; Documents enter with the Records Management extension.
+- *Expiry period* replaces *retention period* in the core (STO-16). Retention stays a term of the Records Management extension.
+- Terminology: added item, caller, user, recipient, manager, share permission and expiry period. "Authorised" and "designated" users are replaced by a named permission or by the manager of a Container.
+
+| Change | Labels |
+|---|---|
+| Reworded | STO-2, STO-3, STO-8 to STO-12, STO-14, STO-16, STO-18, STO-19, MET-1 to MET-4, MET-6, MET-8, MET-10, MET-14, MET-16, MET-17, ACC-1 to ACC-4, ACC-7, ACC-8, ACC-10, ACC-11, ACC-14 to ACC-16, INT-1 to INT-4, RPT-2 to RPT-4 |
+| Documentation only | STO-6, STO-13, MET-13 (now AUDITABLE), INT-5, RPT-1 |
+| Split | STO-4 into STO-4 and STO-20 (listing the contents of a Container); MET-7 into MET-7 and MET-18 (optical character recognition); MET-11 into MET-11 and MET-19 (listing the Files of a data subject) |
+| New, REQUIRED | STO-22 (deleting a File), STO-23 (listing and restoring deleted items) |
+| New, RECOMMENDED | STO-21 (Version removal), STO-24 (malware scan), STO-25 (conditional replacement), MET-20 (SHA-256 digest), ACC-17 (permissions of a moved item), ACC-18 (sensitivity classification), INT-7 (signed event deliveries) |
+| Merged and removed | STO-15 and MET-12 into STO-10; ACC-12 into ACC-1 |
+| Removed | MET-9 (named as an option in MET-7), ACC-13, INT-6 (CMIS, now named in the reference software) |
+| Moved to the Records Management extension | STO-17 to Records Processes; MET-15 to Records Capture; the document type filter of INT-2 to PRC-15 |
+| Parked for the Working Group | STO-1, see the open questions |
+
+- Module page: reworded *Why choose this conformance module?* and the first use case, added the actors Official and Identity provider and the interfaces Share page and Identity provider, removed CMIS.
+- Functionality descriptions no longer state RECOMMENDED behaviour as a guarantee.
+- Metadata fields are of three kinds: system, reserved and custom.
+- The File Management core now has 67 requirements, 20 REQUIRED and 47 RECOMMENDED (before: 63, 17 and 46). The Records Management extension has 71, 26 REQUIRED and 45 RECOMMENDED.
+
 ## Draft v0.5 (test branch)
 
 - Conformance profiles replaced by conformance modules: the File Management core and the Working Document Collaboration and Records Management extensions.

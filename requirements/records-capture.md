@@ -35,6 +35,17 @@ requirements:
     statement: "The DMS defines document types with typed metadata fields, mandatory fields and a default records process."
     api_operation_id:
     test:
+  # MET-15 (working label; the number is issued on acceptance)
+  - id:
+    status: DRAFT
+    level: RECOMMENDED
+    observability: OBSERVABLE
+    interaction: SERVICE_API
+    statement: "The DMS proposes a document type for an uploaded File and assigns it only after a person confirms the proposal."
+    documentation: |
+      Moved from *Metadata and Search* in the File Management core.
+    api_operation_id:
+    test:
   # REC-4 (working label; the number is issued on acceptance)
   - id:
     status: DRAFT

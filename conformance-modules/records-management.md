@@ -23,14 +23,14 @@ The extension covers records management only. A software solution that claims it
 
 | Functionality | Requirements | REQUIRED | RECOMMENDED |
 |---|---|---|---|
-| [Records Capture](../requirements/records-capture.md) | 11 | 7 | 4 |
-| [Records Processes](../requirements/records-processes.md) | 20 | 10 | 10 |
+| [Records Capture](../requirements/records-capture.md) | 12 | 7 | 5 |
+| [Records Processes](../requirements/records-processes.md) | 21 | 10 | 11 |
 | [Classification and Retention](../requirements/classification-and-retention.md) | 11 | 7 | 4 |
 | [Archival Preservation](../requirements/archival-preservation.md) | 6 | 1 | 5 |
 | [Records Audit Trail](../requirements/records-audit-trail.md) | 10 | 1 | 9 |
 | [Inter-agency Document Exchange](../requirements/document-exchange.md) | 2 | 0 | 2 |
 | [Issued Document Access](../requirements/issued-documents.md) | 9 | 0 | 9 |
-| **Total** | **69** | **26** | **43** |
+| **Total** | **71** | **26** | **45** |
 
 ## Actors relevant for testing
 

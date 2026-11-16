@@ -13,7 +13,6 @@ references:
     - ETSI EN 319 162-1, Electronic Signatures and Infrastructures (ESI) — Associated Signature Containers (ASiC) — Part 1, European Telecommunications Standards Institute.
   interfaces:
     - IETF RFC 4918, HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV), 2007.
-    - OASIS Content Management Interoperability Services (CMIS) Version 1.1, OASIS, 2013.
     - IETF RFC 5424, The Syslog Protocol, 2009.
     - Open Cloud Mesh (OCM), IETF Internet-Draft.
     - Web Application Open Platform Interface (WOPI) protocol.

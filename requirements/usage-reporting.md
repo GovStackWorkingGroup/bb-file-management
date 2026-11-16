@@ -12,6 +12,8 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS reports the storage used per Container and in total."
+    documentation: |
+      The figures count current Versions, earlier Versions and deleted Files that are still restorable.
     api_operation_id:
     test:
   # RPT-2 (working label; the number is issued on acceptance)
@@ -20,16 +22,7 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS reports the number of items created, changed and deleted per day and per week."
-    api_operation_id:
-    test:
-  # RPT-3 (working label; the number is issued on acceptance)
-  - id:
-    status: DRAFT
-    level: RECOMMENDED
-    observability: OBSERVABLE
-    interaction: SERVICE_API
-    statement: "The DMS lists the items that nobody has accessed for a configured period."
+    statement: "The DMS reports the number of items created, changed and deleted per day for a requested period."
     api_operation_id:
     test:
   # RPT-4 (working label; the number is issued on acceptance)
@@ -38,7 +31,7 @@ requirements:
     level: RECOMMENDED
     observability: OBSERVABLE
     interaction: SERVICE_API
-    statement: "The DMS summarises refused access attempts per period, by user and by item."
+    statement: "The DMS summarises refused access attempts per period, by user and by item, for a caller holding an audit permission."
     api_operation_id:
     test:
   # RPT-5 (working label; the number is issued on acceptance)
@@ -54,6 +47,6 @@ requirements:
 
 # Description
 
-Usage Reporting gives administrators the figures the first write-up asked for: storage used, creation and deletion trends, inactive documents and refused access attempts. Two further reports from that write-up are covered elsewhere: the list of all documents about one person (MET-11) and the list of records due for review (RET-6).
+Usage Reporting gives administrators figures on how the document stock develops and where access was refused. Two related lists are covered elsewhere: all Files about one person (MET-19) and the records due for review (RET-6).
 
 Technical monitoring of the running service, such as response times and availability, is inherited from the cross-functional requirements and is not restated.
