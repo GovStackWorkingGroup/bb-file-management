@@ -1,5 +1,19 @@
 # Changelog
 
+## Draft v0.6, Service API of the File Management core
+
+Adds a first draft of the Service API. It covers the most important operations of the File Management core; the extensions have no operations yet. Requirements are unchanged except where noted.
+
+- New contract `api/openapi.yaml` (OpenAPI 3.1.2, API version `1.0.0-draft`), written to the GovStack Cross-BB API Design Guide and ruleset 0.3.0-draft: 27 operations for Containers, Files and their content, Versions, deleted items, search, permission grants, share links and event subscriptions, the File event webhook, and `/health`. Each operation has a plain-language summary and description (Purpose, When to use, You provide, You get back, Rules, Related, Technical notes).
+- Conventions of the guide applied: `/v1` paths, RFC 9457 problems under `https://govstack.global/problems/document-management/`, cursor pagination, `Idempotency-Key` on creating requests, strong `ETag` and `If-Match`, W3C trace context, OAuth 2.0 for people and for services with namespaced scopes, CloudEvents 1.0 for events.
+- New files: `api/index.yaml`, `api/coverage.yaml` (empty while requirements are DRAFT), `api/README.md`, the vendored shared schemas `api/common/govstack-openapi-common.yaml`, `resources/api.yml` (link to the contract, at the location the Specification Framework names) and `resources/api-reference.md` (operations, requirement mapping, design decisions, mapping to the reference software, validation).
+- `api_operation_id` filled for 32 requirements of the File Management core; a requirement that needs several operations lists them.
+- `metadata.yml`: version 0.6-draft and `maturity: 1`. The specification stays at maturity 1 until every `SERVICE_API` requirement names an operation and two software solutions have checked the contract.
+- Documentation updated: STO-13 (the resumable upload protocol is an open question), INT-5 (WebDAV is an additional channel, not the Service API).
+- Module pages: the interface *Document Management API* now refers to `api/openapi.yaml`; *File events* to the webhook `fileEvent`.
+- Terminology: added permission grant and share link.
+- Open questions: the Service API strategy is answered as a proposal; 13 questions on the contract added.
+
 ## Draft v0.5, second review of the File Management core
 
 Applies the decisions of the second review, which looked for statements that can go, and renames two functionalities.

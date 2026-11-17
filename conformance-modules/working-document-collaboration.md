@@ -44,4 +44,4 @@ The interfaces of the File Management core are described in `file-management.md`
 |---|---|---|---|---|---|
 | Web interface and synchronisation clients | Collaborating official, guest editor | Both | Collaborative Editing, Collaboration History | User interface | This specification |
 | Federated sharing | Partner organisation's system | Both | Collaborative Editing (WRK-12) | Protocol | Open Cloud Mesh (OCM) |
-| Document Management API | Service application | Inbound | Collaborative Editing, Collaboration History | Service API | This specification, `resources/api` (to be written) |
+| Document Management API | Service application | Inbound | Collaborative Editing, Collaboration History | Service API | This specification, `api/openapi.yaml` (operations of this extension not yet written) |

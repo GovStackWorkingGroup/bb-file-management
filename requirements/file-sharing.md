@@ -14,7 +14,7 @@ requirements:
     statement: "The DMS creates a link that gives read access to one File or Container until an expiry date, when one is set."
     documentation: |
       Safeguards: a password on the link (ACC-9) and revocation (ACC-11).
-    api_operation_id:
+    api_operation_id: createShareLink
     test:
   # ACC-9 (working label; the number is issued on acceptance)
   - id:
@@ -34,7 +34,7 @@ requirements:
     statement: "The DMS creates an upload-only link with an expiry date through which a recipient adds Files to a Container without seeing its contents."
     documentation: |
       Safeguard: revocation (ACC-11).
-    api_operation_id:
+    api_operation_id: createShareLink
     test:
   # ACC-11 (working label; the number is issued on acceptance)
   - id:
@@ -45,7 +45,7 @@ requirements:
     statement: "The DMS revokes a Share so that every later request through it is refused."
     documentation: |
       Condition: applies when the software solution offers any Share.
-    api_operation_id:
+    api_operation_id: [listShareLinks, revokeShareLink]
     test:
   # ACC-16 (working label; the number is issued on acceptance)
   - id:

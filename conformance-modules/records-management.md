@@ -50,7 +50,7 @@ The interfaces of the File Management core are described in `file-management.md`
 
 | Interface | Counterpart | Direction | Functionalities | Type | Contract defined in |
 |---|---|---|---|---|---|
-| Document Management API | Service application, records manager, process engine, automated agent, issuing service | Inbound | All Records Management functionalities | Service API | This specification, `resources/api` (to be written) |
+| Document Management API | Service application, records manager, process engine, automated agent, issuing service | Inbound | All Records Management functionalities | Service API | This specification, `api/openapi.yaml` (operations of this extension not yet written) |
 | Web interface | Step assignee | Both | Records Processes (PRC-7, PRC-12, PRC-17) | User interface | This specification |
 | Records events | Event subscriber | Outbound | Records Processes (PRC-15), Issued Document Access (DOC-7) | Event | This specification |
 | Exports | Administrator, security monitoring | Outbound | Records Audit Trail (ACT-4, ACT-8), Issued Document Access (DOC-8) | File | This specification; IETF RFC 5424 |

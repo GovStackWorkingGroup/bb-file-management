@@ -1,0 +1,10 @@
+version: 1
+# Requirement-to-operation traceability (API Design Guide 4.6).
+# All requirements of this specification are DRAFT and unnumbered in the Specification
+# Framework, so there are no active requirements to trace and no GovStack requirement
+# identifiers to list under draftRequirements yet. Until numbers are issued, each requirement
+# names its operations in `api_operation_id` in requirements/*.md, and
+# api/README.md shows the mapping by working label. When requirements are accepted and
+# numbered, every REQUIRED and RECOMMENDED requirement is listed here.
+requirements: []
+draftRequirements: []

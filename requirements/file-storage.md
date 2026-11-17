@@ -13,7 +13,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS stores a File submitted through its API and returns a unique identifier."
-    api_operation_id:
+    api_operation_id: uploadFile
     test:
   # STO-2 (working label; the number is issued on acceptance)
   - id:
@@ -22,7 +22,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS returns the content of a File, byte for byte as submitted, when given its identifier."
-    api_operation_id:
+    api_operation_id: downloadFileContent
     test:
   # STO-3 (working label; the number is issued on acceptance)
   - id:
@@ -31,7 +31,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS keeps the identifier of a File or Container unchanged when it is renamed, moved, given a new Version or restored after deletion."
-    api_operation_id:
+    api_operation_id: [retrieveFile, retrieveContainer]
     test:
   # STO-4 (working label; the number is issued on acceptance)
   - id:
@@ -40,7 +40,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS creates, renames, moves and deletes Containers through its API."
-    api_operation_id:
+    api_operation_id: [createContainer, updateContainer, deleteContainer]
     test:
   # STO-5 (working label; the number is issued on acceptance)
   - id:
@@ -49,7 +49,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS stores replaced content as a new Version under the same identifier."
-    api_operation_id:
+    api_operation_id: replaceFileContent
     test:
   # STO-6 (working label; the number is issued on acceptance)
   - id:
@@ -60,7 +60,7 @@ requirements:
     statement: "The DMS lists the Versions of a File and returns the content of any retained Version."
     documentation: |
       Constraint: a Version is removed only on request of a caller with delete permission or under a configured Version policy.
-    api_operation_id:
+    api_operation_id: [listFileVersions, downloadFileVersionContent]
     test:
   # STO-7 (working label; the number is issued on acceptance)
   - id:
@@ -69,7 +69,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS rejects an upload that exceeds a configured maximum file size and states the limit in its error response."
-    api_operation_id:
+    api_operation_id: [uploadFile, replaceFileContent]
     test:
   # STO-8 (working label; the number is issued on acceptance)
   - id:
@@ -82,7 +82,7 @@ requirements:
       Replaces the rule of govstack-cfr-data#req-7 on hard deletion for this Building Block: the purge after the recovery period is routine, for data minimisation, where the cross-functional requirement permits hard deletion only when a regulation or a data subject request demands it.
       The deletion record of govstack-cfr-data#req-7, with actor, time and method, is inherited and covers each purge.
       Recoverable deletion is REQUIRED here, because a citizen's lost submission is costly to recover.
-    api_operation_id:
+    api_operation_id: [deleteFile, deleteContainer]
     test:
   # STO-9 (working label; the number is issued on acceptance)
   - id:
@@ -91,7 +91,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS assigns each Container to an organisational unit or group with one or more managers, and keeps the Container and its contents manageable when a user account is removed."
-    api_operation_id:
+    api_operation_id: [createContainer, retrieveContainer, updateContainer]
     test:
   # STO-10 (working label; the number is issued on acceptance)
   - id:
@@ -113,7 +113,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS lists the Containers and Files directly inside a Container."
-    api_operation_id:
+    api_operation_id: listContainerItems
     test:
   # STO-22 (working label; the number is issued on acceptance)
   - id:
@@ -122,7 +122,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS deletes a File on request of a caller with delete permission."
-    api_operation_id:
+    api_operation_id: deleteFile
     test:
   # STO-23 (working label; the number is issued on acceptance)
   - id:
@@ -131,7 +131,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS lists the deleted Files and Containers that are still restorable and restores one on request, with its identifier, Versions and metadata."
-    api_operation_id:
+    api_operation_id: [listDeletedItems, restoreDeletedItem]
     test:
   # STO-11 (working label; the number is issued on acceptance)
   - id:
@@ -140,7 +140,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS restores a previous Version by storing its content as a new current Version."
-    api_operation_id:
+    api_operation_id: restoreFileVersion
     test:
   # STO-12 (working label; the number is issued on acceptance)
   - id:
@@ -149,7 +149,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS rejects an upload whose media type, as detected from its content, is not on a configured allow-list."
-    api_operation_id:
+    api_operation_id: [uploadFile, replaceFileContent]
     test:
   # STO-13 (working label; the number is issued on acceptance)
   - id:
@@ -159,7 +159,7 @@ requirements:
     interaction: SERVICE_API
     statement: "The DMS accepts resumable uploads, so that an interrupted upload continues from the last byte received."
     documentation: |
-      Constraint: the resumable upload protocol is defined with the Service API (`resources/api`, to be written). Until then, two conformant software solutions need not accept the same client.
+      Constraint: the resumable upload protocol is not yet part of the Service API contract (`api/openapi.yaml`); the open questions name the candidate protocol. Until then, two conformant software solutions need not accept the same client.
     api_operation_id:
     test:
   # STO-14 (working label; the number is issued on acceptance)
@@ -171,7 +171,7 @@ requirements:
     statement: "The DMS rejects an upload that would exceed the storage quota configured for its Container and states the quota in its error response."
     documentation: |
       Constraint: a quota never causes a purge before the recovery period of STO-8 ends.
-    api_operation_id:
+    api_operation_id: [uploadFile, replaceFileContent]
     test:
   # STO-16 (working label; the number is issued on acceptance)
   - id:
@@ -223,7 +223,7 @@ requirements:
     statement: "The DMS rejects a replacement of content that names an expected current Version other than the actual one."
     documentation: |
       Prevents a lost update when two callers replace the content of one File at the same time (STO-5).
-    api_operation_id:
+    api_operation_id: replaceFileContent
     test:
 ---
 

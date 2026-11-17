@@ -61,6 +61,12 @@
     designation: Share
     description: A grant of access to a Document, File or Container for a user, a group or the holder of a link, with a role and an optional expiry.
 - entry:
+    designation: permission grant
+    description: A Share to a named user, group or service identity that gives one or more of the read, write, delete and share permissions on an item. In the Service API it is the resource `permission-grants`.
+- entry:
+    designation: share link
+    description: A Share to the holder of a link, who needs no account. It gives read access to an item or upload-only access to a Container, until it expires or is revoked.
+- entry:
     designation: item
     description: A File or a Container.
 - entry:

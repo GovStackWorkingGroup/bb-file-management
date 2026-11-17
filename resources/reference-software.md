@@ -15,3 +15,5 @@ The File Management core is defined based on the commonalities of all software p
 Alfresco also offers the OASIS Content Management Interoperability Services (CMIS) 1.1, which this specification names here and no longer requires (formerly INT-6).
 
 Nextcloud and OpenCloud are not expected to claim Records Management: OpenCloud described lifecycle management as outside its core scope and is adding only basic retention cleanup (2026-08-31). Alfresco and Webware are not expected to claim Working Document Collaboration, although both offer some collaboration features.
+
+How the operations of the draft Service API correspond to the interfaces of these software products is shown in `resources/api-reference.md`, *Mapping to the reference software*.

@@ -14,7 +14,7 @@ requirements:
     statement: "The DMS grants and revokes read, write, delete and share permissions on a File or Container for individual users, groups and service identities."
     documentation: |
       A software solution MAY let a grant carry an expiry date. A grant to a named user or group replaces the named share in a viewer or editor role (formerly ACC-12).
-    api_operation_id:
+    api_operation_id: [createPermissionGrant, revokePermissionGrant]
     test:
   # ACC-2 (working label; the number is issued on acceptance)
   - id:
@@ -23,7 +23,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS applies the permissions of a Container to the items inside it."
-    api_operation_id:
+    api_operation_id: listPermissionGrants
     test:
   # ACC-3 (working label; the number is issued on acceptance)
   - id:
@@ -32,7 +32,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS lists which user, group or service identity holds which permission on an item, to a caller with share permission."
-    api_operation_id:
+    api_operation_id: listPermissionGrants
     test:
   # ACC-4 (working label; the number is issued on acceptance)
   - id:
@@ -91,7 +91,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS applies the permissions of the new Container to a moved item and keeps the permissions granted on the item itself."
-    api_operation_id:
+    api_operation_id: updateFile
     test:
   # ACC-18 (working label; the number is issued on acceptance)
   - id:

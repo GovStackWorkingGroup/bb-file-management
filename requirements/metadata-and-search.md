@@ -13,7 +13,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS returns for each File its identifier, name, parent Container, media type, size in bytes, creator, creation time, last modification time and current Version number."
-    api_operation_id:
+    api_operation_id: retrieveFile
     test:
   # MET-2 (working label; the number is issued on acceptance)
   - id:
@@ -24,7 +24,7 @@ requirements:
     statement: "The DMS stores, changes and removes custom metadata as key-value pairs with string values on a File, and returns them with it."
     documentation: |
       Typed values come with a metadata schema (MET-6).
-    api_operation_id:
+    api_operation_id: [uploadFile, retrieveFile, updateFile]
     test:
   # MET-3 (working label; the number is issued on acceptance)
   - id:
@@ -35,7 +35,7 @@ requirements:
     statement: "The DMS returns the Files and Containers whose name or system metadata match a query."
     documentation: |
       Constraint: a query supports at least an exact match per field, a substring match on the name, ranges on times and size, and paged results.
-    api_operation_id:
+    api_operation_id: searchItems
     test:
   # MET-4 (working label; the number is issued on acceptance)
   - id:
@@ -44,7 +44,7 @@ requirements:
     observability: OBSERVABLE
     interaction: SERVICE_API
     statement: "The DMS returns the Files that match a query on custom metadata values."
-    api_operation_id:
+    api_operation_id: searchItems
     test:
   # MET-5 (working label; the number is issued on acceptance)
   - id:
@@ -97,7 +97,7 @@ requirements:
     statement: "The DMS records the authenticated calling service and the correlation identifier of each upload as system metadata that callers cannot change."
     documentation: |
       Extends govstack-cfr-data#req-9.
-    api_operation_id:
+    api_operation_id: [uploadFile, retrieveFile]
     test:
   # MET-11 (working label; the number is issued on acceptance)
   - id:
@@ -191,7 +191,7 @@ requirements:
     statement: "The DMS returns a SHA-256 digest of the content of each Version."
     documentation: |
       A service application can verify an upload and later show that the content is unchanged. REC-9 adds verification on request for finalized Versions.
-    api_operation_id:
+    api_operation_id: [retrieveFile, listFileVersions]
     test:
 ---
 

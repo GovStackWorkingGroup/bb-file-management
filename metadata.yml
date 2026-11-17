@@ -13,11 +13,22 @@ repository: https://github.com/GovStackWorkingGroup/bb-file-management
 urn: govstack:spec:bb:dms
 owner_group: govstack:wg:dms
 versions:
+  - version: 0.6-draft
+    url_suffix: /document-management/0.6-draft
+    release_date:
+    latest: true
+    short_description: Adds a first draft of the Service API (OpenAPI 3.1) for the most important operations of the File Management core.
   - version: 0.5-draft
     url_suffix: /document-management/0.5-draft
     release_date:
-    latest: true
+    latest: false
     short_description: Test draft organised by capabilities, functionalities and three conformance modules (one core, two extensions).
+
+# Specification maturity (Specification Framework, chapters/specification_maturity.md).
+# Stays at 1: the draft contract in api/openapi.yaml (linked as resources/api.yml) does not
+# yet name an operation for every SERVICE_API requirement, and has not been checked against
+# two software solutions. See resources/api-reference.md.
+maturity: 1 # 0,1,2,3,4
 
 # Capabilities follow the document lifecycle (capture to preservation), followed by
 # capabilities that apply at every stage. Informative: they carry no requirements.

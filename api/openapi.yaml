@@ -1,0 +1,3736 @@
+openapi: 3.1.2
+info:
+  title: GovStack Document Management API
+  version: 1.0.0-draft
+  summary: File Management core of the GovStack Document Management Building Block.
+  description: |-
+    This DRAFT contract describes how service applications and the people who use them store,
+    retrieve, find and protect documents in the Document Management Building Block. It covers
+    the most important operations of the **File Management core** only. The Working Document
+    Collaboration and Records Management extensions are not yet part of the contract.
+
+    ### Understand the data
+
+    - A **Container** groups Files and other Containers, such as a folder, a team space or a
+      case file. It belongs to an organisational unit or a group, not to one person, and has
+      one or more managers.
+    - A **File** is a digital object stored as one unit, such as a PDF or an office file. It
+      has content and metadata.
+    - A **Version** is a stored state of the content of a File. Replacing the content adds a
+      new Version; earlier Versions are kept.
+    - An **item** is a File or a Container. Its identifier never changes, whether the item is
+      renamed, moved, given a new Version or restored after deletion.
+    - A **permission grant** gives a user, a group or a service the permission to read,
+      write, delete or share an item. Grants on a Container apply to the items inside it.
+    - A **share link** gives the holder of a link access to one item without an account:
+      read access to download, or upload-only access to add Files to a Container.
+    - A **subscription** asks the Document Management Building Block to send File events to a
+      web address of the subscriber.
+
+    ### What a conformant software solution offers
+
+    Every operation of this contract belongs to the File Management core. An operation is
+    required for a claim of the core when a REQUIRED requirement names it; the others are
+    RECOMMENDED. The requirements name their operations in `api_operation_id`, and
+    `api/coverage.yaml` lists the mapping. A software solution keeps its own paths and
+    operation identifiers and marks each of its operations with `x-govstack-operation`.
+
+    | Group | Operations | Required for the core |
+    | --- | --- | --- |
+    | Containers | Create, retrieve, update, delete a Container; list its items | All |
+    | Files | Upload, retrieve, update, delete a File; download and replace its content | All |
+    | Versions | List Versions, download a Version, restore a Version | List and download |
+    | Deleted items | List deleted items, restore a deleted item | All |
+    | Search | Search items | Yes |
+    | Permissions | List, create and revoke permission grants | All |
+    | Share links | Create, list and revoke share links | None |
+    | Subscriptions | Create, list, retrieve and delete subscriptions; File events | None |
+
+    ### Shared rules
+
+    - Every request is authorised against the permissions of the caller. An item that does not
+      exist and an item the caller may not read give the same "not found" answer.
+    - Lists and search results are returned in pages. Ask for the next page with the
+      continuation value of the previous page.
+    - Other channels a software solution offers, such as WebDAV or a web interface, apply the
+      same permissions as this API.
+
+    The `/v1` paths identify this API compatibility line; `info.version` versions the draft
+    contract, independently of the version of the specification. The default response
+    language is English (`en`). Transport security follows the cross-functional requirements.
+  contact:
+    name: GovStack Document Management Working Group
+    url: https://github.com/GovStackWorkingGroup/bb-file-management
+  license:
+    name: Apache 2.0
+    identifier: Apache-2.0
+  x-govstack-api-guide:
+    version: 0.3.0-draft
+    rulesetVersion: 0.3.0-draft
+servers:
+  - url: https://{gatewayHost}
+    description: >-
+      Deployment root; dms.example is non-production. A deployment may add a stable routing
+      prefix, such as /document-management, before the versioned resource paths.
+    variables:
+      gatewayHost:
+        default: dms.example
+        description: Deployment gateway hostname; dms.example is non-production.
+security:
+  - userOAuth: [bb:document-management:item:read]
+  - serviceOAuth: [bb:document-management:item:read]
+tags:
+  - name: Health
+    description: Operational liveness without document information.
+  - name: Containers
+    description: Containers that group Files, such as folders, team spaces and case files.
+  - name: Files
+    description: Files, their metadata and their current content.
+  - name: Versions
+    description: Earlier states of the content of a File.
+  - name: Deleted items
+    description: Deleted Files and Containers that can still be restored.
+  - name: Search
+    description: Finding Files and Containers by their name and metadata.
+  - name: Permissions
+    description: Who may read, write, delete or share an item.
+  - name: Share links
+    description: Links that give access to one item without an account.
+  - name: Subscriptions
+    description: Registrations for File events delivered by webhook.
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Check that the service is available
+      description: |-
+        **Purpose:** Tells an operator or a monitoring system whether the Document Management
+        service can accept work.
+
+        **When to use:** When checking the service at regular intervals or before routing
+        traffic to it.
+
+        **You provide:** Nothing.
+
+        **You get back:** Whether the service is available, with a public label of the service.
+
+        **Rules:** No sign-in is needed. The answer reveals no documents and no internal details.
+
+        ---
+
+        **Technical notes:** Returns `200` when the service can accept work and `503` otherwise.
+        Unversioned, as set by the API Design Guide (5.9).
+      tags: [Health]
+      security: []
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+      responses:
+        '200':
+          description: The service is available and can accept work.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/containers:
+    post:
+      operationId: createContainer
+      summary: Create a Container
+      description: |-
+        **Purpose:** Creates a new place to keep Files together, such as a folder, a team space
+        or the case file of one application.
+
+        **When to use:** When a service starts a new case, or an organisational unit needs a new
+        area for its documents.
+
+        **You provide:** A name for the Container and either the Container it goes into or the
+        organisational unit or group that owns it. You may name the managers of the Container.
+
+        **You get back:** The new Container with its identifier, which never changes. Keep the
+        identifier with the case or record it belongs to.
+
+        **Rules:** You must be allowed to write in the Container you create it in. A Container at
+        the top level needs an owner, and it needs at least one manager; if you name none, you
+        become its manager. A Container inside another one takes the owner of the Container
+        above it unless you name another. Some software solutions refuse a name that is already
+        used in the same place.
+
+        **Related:** Use "Upload a File" to put Files into the Container and "Grant permissions
+        on an item" to give others access.
+
+        ---
+
+        **Technical notes:** Requires an `Idempotency-Key`; a retry with the same key returns the
+        original result. Returns `201` with `Location` and a strong `ETag`.
+        Requirements: STO-4, STO-9.
+      tags: [Containers]
+      security:
+        - userOAuth: [bb:document-management:item:write]
+        - serviceOAuth: [bb:document-management:item:write]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContainerCreate'
+            examples:
+              caseFile:
+                summary: A case file inside the Container of a permit office
+                value:
+                  name: CP-2026-00042
+                  parentId: cnt_permits_2026
+              topLevel:
+                summary: A team space owned by an organisational unit
+                value:
+                  name: Building permits 2026
+                  owner:
+                    type: ORGANISATIONAL_UNIT
+                    id: ou_building_authority
+                  managers:
+                    - type: USER
+                      id: usr_8f2c41
+      responses:
+        '201':
+          $ref: '#/components/responses/ContainerCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/containers/{containerId}:
+    get:
+      operationId: retrieveContainer
+      summary: Retrieve one Container by its identifier
+      description: |-
+        **Purpose:** Shows the details of one Container: its name, where it sits, which
+        organisational unit or group owns it and who manages it.
+
+        **When to use:** When you already know the identifier of a Container, for example because
+        your service stored it with a case.
+
+        **You provide:** The identifier of the Container.
+
+        **You get back:** The details of the Container.
+
+        **Rules:** You must be allowed to read the Container. If it does not exist, has been
+        deleted or you may not read it, you get the same "not found" answer, so hidden
+        Containers are never revealed.
+
+        **Related:** Use "List the items in a Container" to see what it holds.
+
+        ---
+
+        **Technical notes:** Returns a strong `ETag`; send it in `If-Match` to update the
+        Container safely, or in `If-None-Match` to receive `304` when nothing has changed.
+        Requirements: STO-3, STO-9.
+      tags: [Containers]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ContainerId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/Container'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    patch:
+      operationId: updateContainer
+      summary: Update, rename or move a Container
+      description: |-
+        **Purpose:** Changes the name of a Container, moves it into another Container, or
+        changes the organisational unit or group that owns it and its managers.
+
+        **When to use:** When a case file is renamed, a folder is reorganised, or responsibility
+        for a Container passes to another unit or manager.
+
+        **You provide:** The identifier of the Container and only the details you want to change.
+
+        **You get back:** The Container with its new details. Its identifier stays the same.
+
+        **Rules:** You must be allowed to write the Container. To move it, you must also be
+        allowed to write in the Container you move it into, and you cannot move a Container into
+        itself or into one of the Containers it holds. Changing the owner or the managers is
+        reserved to a manager of the Container. A Container always keeps at least one manager.
+        If someone changed the Container after you last retrieved it and you asked for a safe
+        update, nothing is changed and you are told so.
+
+        **Related:** Use "Retrieve one Container by its identifier" first to get its current
+        state.
+
+        ---
+
+        **Technical notes:** JSON Merge Patch (RFC 7396). Send the `ETag` from the last retrieval
+        in `If-Match` for an optimistic update; a mismatch returns `412`. Moving into a
+        descendant returns `422` `invalid-move`. Requirements: STO-3, STO-4, STO-9.
+      tags: [Containers]
+      security:
+        - userOAuth: [bb:document-management:item:write]
+        - serviceOAuth: [bb:document-management:item:write]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ContainerId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ContainerUpdate'
+            examples:
+              rename:
+                summary: Rename a case file
+                value:
+                  name: CP-2026-00042 (withdrawn)
+              move:
+                summary: Move a case file into the archive area of the unit
+                value:
+                  parentId: cnt_permits_closed
+      responses:
+        '200':
+          $ref: '#/components/responses/Container'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      operationId: deleteContainer
+      summary: Delete a Container and its contents
+      description: |-
+        **Purpose:** Removes a Container, with everything in it, from normal use while keeping it
+        restorable for a period.
+
+        **When to use:** When a folder or case file is no longer needed.
+
+        **You provide:** The identifier of the Container.
+
+        **You get back:** A confirmation. The Container and its contents are now listed among the
+        deleted items until the recovery period ends; then they are removed for good.
+
+        **Rules:** You must be allowed to delete the Container and the items inside it. If an item
+        inside is protected or you may not delete it, nothing is deleted and you are told so. If
+        someone changed the Container after you last retrieved it and you asked for a safe
+        deletion, nothing is deleted.
+
+        **Related:** Use "Restore a deleted item" to bring it back, and "List deleted items" to
+        see when it will be removed for good.
+
+        ---
+
+        **Technical notes:** Returns `204`. A repeated request returns `404` because the Container
+        is no longer in normal use. `If-Match` is optional; a mismatch returns `412`. An item that
+        prevents deletion returns `409` `deletion-blocked`. Requirements: STO-4, STO-8.
+      tags: [Containers]
+      security:
+        - userOAuth: [bb:document-management:item:delete]
+        - serviceOAuth: [bb:document-management:item:delete]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/ContainerId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: The Container and its contents are deleted and can be restored until the recovery period ends.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/containers/{containerId}/items:
+    get:
+      operationId: listContainerItems
+      summary: List the items in a Container
+      description: |-
+        **Purpose:** Shows the Files and Containers that sit directly inside one Container.
+
+        **When to use:** When a case officer opens a case file, or a service needs every document
+        submitted for one application.
+
+        **You provide:** The identifier of the Container. You may ask for Files only or Containers
+        only, choose the order, and say how many items you want per page.
+
+        **You get back:** One page of items with their details, and a continuation value when
+        there are more.
+
+        **Rules:** You must be allowed to read the Container. Only the items you may read are
+        listed. Deleted items are not listed. The order stays the same while you page through
+        the results.
+
+        **Related:** Use "Search items" to find items in all the Containers below this one.
+
+        ---
+
+        **Technical notes:** Cursor pagination. The default order is by `name`, with the item
+        identifier as tie-breaker. Keep `itemType`, `sort` and `pageSize` unchanged on
+        continuation requests. Requirements: STO-20.
+      tags: [Containers]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ContainerId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/ItemTypeFilter'
+        - $ref: '#/components/parameters/ItemSort'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/containers/{containerId}/files:
+    post:
+      operationId: uploadFile
+      summary: Upload a File into a Container
+      description: |-
+        **Purpose:** Stores a new File, such as a scanned certificate or a site photo, in a
+        Container and gives it an identifier that never changes.
+
+        **When to use:** When a citizen submits a supporting document through a service, or an
+        official or a service produces a document that must be kept.
+
+        **You provide:** The Container, the content of the File and its name. You may add your
+        own metadata as pairs of names and values, such as an application number.
+
+        **You get back:** The new File with its identifier, its first Version and its details,
+        including a fingerprint of the content where the software solution offers one. Keep the
+        identifier with the case it belongs to.
+
+        **Rules:** You must be allowed to write in the Container. A File larger than the maximum
+        size, or one that would exceed the storage quota of the Container, is refused and the
+        answer states the limit. A software solution may also refuse kinds of files that are
+        not on its allowed list. The software solution records which service uploaded the File
+        and the reference of the request; nobody can change these later. Some software
+        solutions refuse a name that is already used in the same Container.
+
+        **Related:** Use "Replace the content of a File" to store a better scan of the same
+        document as a new Version.
+
+        ---
+
+        **Technical notes:** `multipart/form-data` with a JSON part `metadata` and a binary part
+        `content`. Requires an `Idempotency-Key`. Returns `201` with `Location` and the strong
+        `ETag` of the File. Too large: `413` `content-too-large` with `maxSizeBytes`. Quota:
+        `507` `quota-exceeded` with `quotaBytes`. Media type refused: `422`
+        `media-type-not-allowed`. The trace-id of `traceparent` is stored as `correlationId`.
+        Requirements: STO-1, STO-7, STO-12, STO-14, MET-2, MET-10.
+      tags: [Files]
+      security:
+        - userOAuth: [bb:document-management:item:write]
+        - serviceOAuth: [bb:document-management:item:write]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ContainerId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+            encoding:
+              metadata:
+                contentType: application/json
+            examples:
+              sitePhoto:
+                summary: A site photo with the application number of the case
+                value:
+                  metadata:
+                    name: site-photo.jpg
+                    customMetadata:
+                      applicationNumber: CP-2026-00042
+                      documentCategory: site-photo
+                  content: (the bytes of the JPEG image)
+      responses:
+        '201':
+          $ref: '#/components/responses/FileCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '413':
+          $ref: '#/components/responses/ContentTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '507':
+          $ref: '#/components/responses/QuotaExceeded'
+  /v1/files/{fileId}:
+    get:
+      operationId: retrieveFile
+      summary: Retrieve the details of one File
+      description: |-
+        **Purpose:** Shows the details of one File without its content: its name, the Container
+        it sits in, its kind and size, who created it and when, its current Version and your own
+        metadata.
+
+        **When to use:** When you know the identifier of a File, for example from a case record,
+        a list or an event, and need its details or want to check it before downloading it.
+
+        **You provide:** The identifier of the File.
+
+        **You get back:** The details of the File, including a fingerprint of its content where
+        the software solution offers one.
+
+        **Rules:** You must be allowed to read the File. If it does not exist, has been deleted
+        or you may not read it, you get the same "not found" answer, so hidden Files are never
+        revealed.
+
+        **Related:** Use "Download the content of a File" for the content and "List the Versions
+        of a File" for its history.
+
+        ---
+
+        **Technical notes:** Returns a strong `ETag` for the details; `contentETag` is the
+        validator of the current content. `If-None-Match` returns `304` when nothing has
+        changed. Requirements: STO-3, MET-1, MET-2, MET-10, MET-20.
+      tags: [Files]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/File'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    patch:
+      operationId: updateFile
+      summary: Update, rename or move a File
+      description: |-
+        **Purpose:** Changes the name of a File, moves it into another Container, or adds,
+        changes or removes your own metadata on it, without touching its content.
+
+        **When to use:** When a document is filed in the wrong case, is given a clearer name, or
+        a service records an application number or a status on it.
+
+        **You provide:** The identifier of the File and only the details you want to change. To
+        remove one of your metadata entries, send it without a value.
+
+        **You get back:** The File with its new details. Its identifier and its Versions stay the
+        same.
+
+        **Rules:** You must be allowed to write the File, and to move it you must also be allowed
+        to write in the Container you move it into. A moved File takes the permissions of its
+        new Container and keeps the permissions given on the File itself. Details the software
+        solution maintains, such as size or creation time, cannot be changed. If someone changed
+        the File after you last retrieved it and you asked for a safe update, nothing is changed.
+
+        **Related:** Use "Replace the content of a File" to change the content.
+
+        ---
+
+        **Technical notes:** JSON Merge Patch (RFC 7396): a `null` value in `customMetadata`
+        removes that key. `If-Match` with the `ETag` of the last retrieval makes the update
+        conditional; a mismatch returns `412`. Requirements: STO-3, MET-2, ACC-17.
+      tags: [Files]
+      security:
+        - userOAuth: [bb:document-management:item:write]
+        - serviceOAuth: [bb:document-management:item:write]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/FileUpdate'
+            examples:
+              metadata:
+                summary: Record a status and remove an obsolete entry
+                value:
+                  customMetadata:
+                    documentStatus: checked
+                    draftReference: null
+              move:
+                summary: Move a File into another case file and rename it
+                value:
+                  parentId: cnt_case_00042
+                  name: ownership-certificate.pdf
+      responses:
+        '200':
+          $ref: '#/components/responses/File'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      operationId: deleteFile
+      summary: Delete a File
+      description: |-
+        **Purpose:** Removes a File, with all its Versions, from normal use while keeping it
+        restorable for a period.
+
+        **When to use:** When a document was uploaded by mistake or is no longer needed.
+
+        **You provide:** The identifier of the File.
+
+        **You get back:** A confirmation. The File is now listed among the deleted items until the
+        recovery period ends; then it is removed for good.
+
+        **Rules:** You must be allowed to delete the File. A File that a manager has marked as
+        protected cannot be deleted. If someone changed the File after you last retrieved it and
+        you asked for a safe deletion, nothing is deleted.
+
+        **Related:** Use "Restore a deleted item" to bring it back.
+
+        ---
+
+        **Technical notes:** Returns `204`. A repeated request returns `404`. `If-Match` is
+        optional; a mismatch returns `412`. A protected File returns `409` `deletion-blocked`.
+        Requirements: STO-8, STO-22.
+      tags: [Files]
+      security:
+        - userOAuth: [bb:document-management:item:delete]
+        - serviceOAuth: [bb:document-management:item:delete]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: The File is deleted and can be restored until the recovery period ends.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/files/{fileId}/content:
+    get:
+      operationId: downloadFileContent
+      summary: Download the content of a File
+      description: |-
+        **Purpose:** Gives you the current content of a File exactly as it was stored, byte for
+        byte.
+
+        **When to use:** When an official opens a document, or a service needs the document to
+        process, show or send it.
+
+        **You provide:** The identifier of the File.
+
+        **You get back:** The content of the current Version, with its kind and its name for
+        saving.
+
+        **Rules:** You must be allowed to read the File. The same "not found" answer is given for
+        a File that does not exist, has been deleted or that you may not read.
+
+        **Related:** Use "Download the content of a Version" for an earlier Version.
+
+        ---
+
+        **Technical notes:** The `Content-Type` header carries the stored media type of the File;
+        the contract lists `application/octet-stream` for any media type. The strong `ETag`
+        identifies the current Version; send it in `If-Match` to "Replace the content of a
+        File" safely. A software solution may honour `Range` requests. Requirements: STO-2.
+      tags: [Files]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/FileContent'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    put:
+      operationId: replaceFileContent
+      summary: Replace the content of a File
+      description: |-
+        **Purpose:** Stores new content for an existing File as a new Version, under the same
+        identifier, while keeping the earlier Versions.
+
+        **When to use:** When a citizen submits a better scan of the same document, or an
+        official saves a corrected copy.
+
+        **You provide:** The identifier of the File and the new content. To make sure nobody
+        replaced the content in the meantime, you may name the Version you expect to be the
+        current one.
+
+        **You get back:** The File with its new current Version.
+
+        **Rules:** You must be allowed to write the File. The same limits as for an upload apply:
+        maximum size, storage quota and, where configured, the list of allowed kinds of files.
+        If you named an expected Version and another Version has become current in the meantime,
+        nothing is stored and you are told so; retrieve the File again and decide.
+
+        **Related:** Use "List the Versions of a File" to see the earlier Versions and "Restore a
+        Version" to go back to one.
+
+        ---
+
+        **Technical notes:** The request body is the binary content; `Content-Type` is the media
+        type of the new content. `If-Match` with the content `ETag` (from a download, or
+        `contentETag` of the File) makes the replacement conditional; a mismatch returns `412`.
+        A repeated request without `If-Match` may store one more Version. Returns `200` with the
+        File. Errors as for "Upload a File into a Container". Requirements: STO-5, STO-7, STO-12,
+        STO-14, STO-25.
+      tags: [Files]
+      security:
+        - userOAuth: [bb:document-management:item:write]
+        - serviceOAuth: [bb:document-management:item:write]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        description: The new content, byte for byte.
+        content:
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/BinaryContent'
+      responses:
+        '200':
+          $ref: '#/components/responses/FileContentReplaced'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '413':
+          $ref: '#/components/responses/ContentTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '507':
+          $ref: '#/components/responses/QuotaExceeded'
+  /v1/files/{fileId}/versions:
+    get:
+      operationId: listFileVersions
+      summary: List the Versions of a File
+      description: |-
+        **Purpose:** Shows the stored Versions of a File, newest first, with who created each one
+        and when.
+
+        **When to use:** When you need to see how a document changed, or find the Version that
+        was valid at a given time.
+
+        **You provide:** The identifier of the File, and how many Versions you want per page.
+
+        **You get back:** One page of Versions with their number, creation time, author, size and
+        fingerprint where offered, and a continuation value when there are more.
+
+        **Rules:** You must be allowed to read the File. A Version is removed only on request of
+        a caller allowed to delete it or under a configured Version policy; removed Versions are
+        not listed.
+
+        **Related:** Use "Download the content of a Version" to get one of them.
+
+        ---
+
+        **Technical notes:** Cursor pagination, ordered by `createdAt` descending with
+        `versionId` as tie-breaker. Requirements: STO-6, MET-20.
+      tags: [Versions]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/FileId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          $ref: '#/components/responses/VersionPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/versions/{versionId}/content:
+    get:
+      operationId: downloadFileVersionContent
+      summary: Download the content of a Version
+      description: |-
+        **Purpose:** Gives you the content of one earlier or current Version of a File, exactly as
+        it was stored.
+
+        **When to use:** When you need to see or reuse a document as it was at an earlier point.
+
+        **You provide:** The identifier of the Version, as listed by "List the Versions of a
+        File".
+
+        **You get back:** The content of that Version, with its kind and its name for saving.
+
+        **Rules:** You must be allowed to read the File. A Version that does not exist, has been
+        removed, or belongs to a File you may not read gives the same "not found" answer.
+
+        **Related:** Use "Restore a Version" to make it the current Version again.
+
+        ---
+
+        **Technical notes:** As for "Download the content of a File"; the `ETag` identifies the
+        Version. Requirements: STO-6.
+      tags: [Versions]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/FileContent'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/versions/{versionId}/restore:
+    post:
+      operationId: restoreFileVersion
+      summary: Restore a Version
+      description: |-
+        **Purpose:** Makes an earlier Version of a File current again, by storing its content as
+        a new Version, so that no history is lost.
+
+        **When to use:** When a wrong document replaced the right one, and you want to go back.
+
+        **You provide:** The identifier of the Version to restore.
+
+        **You get back:** The File with its new current Version, which has the content of the
+        Version you restored.
+
+        **Rules:** You must be allowed to write the File. The Version you restored stays in the
+        list, as do the Versions after it. The storage quota applies.
+
+        **Related:** Use "List the Versions of a File" to find the Version.
+
+        ---
+
+        **Technical notes:** Requires an `Idempotency-Key`. `If-Match` with the content `ETag`
+        makes the restore conditional; a mismatch returns `412`. Returns `200` with the File.
+        Requirements: STO-11.
+      tags: [Versions]
+      security:
+        - userOAuth: [bb:document-management:item:write]
+        - serviceOAuth: [bb:document-management:item:write]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/VersionId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/FileContentReplaced'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '507':
+          $ref: '#/components/responses/QuotaExceeded'
+  /v1/deleted-items:
+    get:
+      operationId: listDeletedItems
+      summary: List deleted items that can be restored
+      description: |-
+        **Purpose:** Shows the Files and Containers that were deleted and can still be restored,
+        with the date on which each will be removed for good.
+
+        **When to use:** When someone deleted a document by mistake, or before a recovery period
+        ends.
+
+        **You provide:** Optionally the kind of item, and how many items you want per page.
+
+        **You get back:** One page of deleted items, newest deletion first, with who deleted each
+        one, when, where it was, and when it will be removed for good.
+
+        **Rules:** You see only deleted items you were allowed to read before deletion. Items
+        whose recovery period has ended are not listed.
+
+        **Related:** Use "Restore a deleted item" to bring one back.
+
+        ---
+
+        **Technical notes:** Cursor pagination, ordered by `deletedAt` descending with `itemId` as
+        tie-breaker. A Container deleted with its contents is listed once; its contents are
+        restored with it. Requirements: STO-8, STO-23.
+      tags: [Deleted items]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/ItemTypeFilter'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          $ref: '#/components/responses/DeletedItemPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/deleted-items/{itemId}/restore:
+    post:
+      operationId: restoreDeletedItem
+      summary: Restore a deleted item
+      description: |-
+        **Purpose:** Brings a deleted File or Container back into normal use, with its
+        identifier, Versions and metadata, before the recovery period ends.
+
+        **When to use:** When a document or a folder was deleted by mistake.
+
+        **You provide:** The identifier of the deleted item.
+
+        **You get back:** The restored File or Container, back in the Container it was deleted
+        from.
+
+        **Rules:** You must be allowed to delete the item, or be a manager of its Container. If
+        the Container it came from no longer exists, or an item with the same name is there now,
+        the item is not restored and you are told so. A Container is restored with the contents
+        it was deleted with.
+
+        **Related:** Use "List deleted items that can be restored" to find the identifier.
+
+        ---
+
+        **Technical notes:** Requires an `Idempotency-Key`. Returns `200` with the restored item.
+        A missing original Container returns `409` `restore-conflict`; a name already in use
+        returns `409` `name-conflict`. Requirements: STO-3, STO-23.
+      tags: [Deleted items]
+      security:
+        - userOAuth: [bb:document-management:item:delete]
+        - serviceOAuth: [bb:document-management:item:delete]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          $ref: '#/components/responses/Item'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '507':
+          $ref: '#/components/responses/QuotaExceeded'
+  /v1/items/search:
+    post:
+      operationId: searchItems
+      summary: Search Files and Containers
+      description: |-
+        **Purpose:** Finds the Files and Containers that match what you know about them, such as
+        part of a name, who created them, when, their kind or size, or one of your own metadata
+        values.
+
+        **When to use:** When you do not know where a document is, for example to find every
+        document of one application number across case files, or the files uploaded last week.
+
+        **You provide:** One or more search criteria, and optionally a Container to search within,
+        the order and how many results you want per page. All the criteria must match.
+
+        **You get back:** One page of matching items with their details, and a continuation value
+        when there are more.
+
+        **Rules:** Only items you may read are returned; others are never revealed, not even as a
+        count. Deleted items are not found. Searching your own metadata values is RECOMMENDED;
+        a software solution that does not offer it says so instead of returning a wrong result.
+
+        **Related:** Use "List the items in a Container" when you know the Container.
+
+        ---
+
+        **Technical notes:** Body-based search (API Design Guide 6.6, 12.9), because criteria can
+        contain personal data such as a creator's identifier. Pagination controls are in the
+        body; repeat the same criteria and sort with the cursor. An unsupported criterion returns
+        `422` `unsupported-criterion`. Requirements: MET-3, MET-4.
+      tags: [Search]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+            examples:
+              byApplication:
+                summary: Every PDF that carries one application number
+                value:
+                  criteria:
+                    itemType: FILE
+                    mediaType: application/pdf
+                    customMetadata:
+                      applicationNumber: CP-2026-00042
+                  sort: -modifiedAt
+                  pageSize: 50
+              byNameAndDate:
+                summary: Files whose name contains "permit", uploaded in March 2026, in one area
+                value:
+                  criteria:
+                    withinContainerId: cnt_permits_2026
+                    name:
+                      contains: permit
+                    createdWithin:
+                      from: '2026-03-01T00:00:00Z'
+                      to: '2026-04-01T00:00:00Z'
+              nextPage:
+                summary: The next page of the same search
+                value:
+                  criteria:
+                    withinContainerId: cnt_permits_2026
+                    name:
+                      contains: permit
+                    createdWithin:
+                      from: '2026-03-01T00:00:00Z'
+                      to: '2026-04-01T00:00:00Z'
+                  cursor: c_9fQm2W4xK8fR3cT6
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/items/{itemId}/permission-grants:
+    get:
+      operationId: listPermissionGrants
+      summary: List who holds which permissions on an item
+      description: |-
+        **Purpose:** Shows which users, groups and services may read, write, delete or share a
+        File or Container, including the permissions it receives from the Containers above it.
+
+        **When to use:** When a manager checks who has access to a case file, or before granting
+        or revoking access.
+
+        **You provide:** The identifier of the File or Container, and how many grants you want
+        per page.
+
+        **You get back:** One page of permission grants. Each one names who holds it, which
+        permissions it gives, until when, and the Container it comes from when it is inherited.
+
+        **Rules:** You must hold the share permission on the item. If you may not read the item,
+        you get the same "not found" answer as for an item that does not exist.
+
+        **Related:** Use "Grant permissions on an item" and "Revoke a permission grant".
+
+        ---
+
+        **Technical notes:** Cursor pagination, grants on the item itself first, then inherited
+        grants from the nearest Container upwards, with `grantId` as tie-breaker.
+        Requirements: ACC-2, ACC-3.
+      tags: [Permissions]
+      security:
+        - userOAuth: [bb:document-management:permission:manage]
+        - serviceOAuth: [bb:document-management:permission:manage]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          $ref: '#/components/responses/PermissionGrantPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      operationId: createPermissionGrant
+      summary: Grant permissions on an item
+      description: |-
+        **Purpose:** Gives a user, a group or a service the permission to read, write, delete or
+        share a File or Container. This is also how a document is shared with named colleagues
+        inside the administration.
+
+        **When to use:** When a case officer joins a case, a team needs access to a folder, or a
+        service must be able to read the documents of another unit.
+
+        **You provide:** The item, who receives the grant, the permissions it gives, and
+        optionally the date on which it ends.
+
+        **You get back:** The new permission grant with its identifier.
+
+        **Rules:** You must hold the share permission on the item, and you cannot give
+        permissions you do not hold yourself. A grant on a Container applies to everything
+        inside it. A software solution that does not offer grants with an end date says so
+        instead of ignoring the date.
+
+        **Related:** Use "Revoke a permission grant" to end it, and "Create a share link" to give
+        access to someone without an account.
+
+        ---
+
+        **Technical notes:** Requires an `Idempotency-Key`. Returns `201` with `Location`. An end
+        date that is not offered returns `422` `unsupported-field`. Requirements: ACC-1, ACC-2.
+      tags: [Permissions]
+      security:
+        - userOAuth: [bb:document-management:permission:manage]
+        - serviceOAuth: [bb:document-management:permission:manage]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionGrantCreate'
+            examples:
+              caseOfficer:
+                summary: A case officer may read and write a case file
+                value:
+                  principal:
+                    type: USER
+                    id: usr_31d9a0
+                  permissions: [READ, WRITE]
+              serviceRead:
+                summary: A service may read a folder until the end of the year
+                value:
+                  principal:
+                    type: SERVICE
+                    id: svc_social_benefits
+                  permissions: [READ]
+                  expiresAt: '2026-12-31T23:59:59Z'
+      responses:
+        '201':
+          $ref: '#/components/responses/PermissionGrantCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/items/{itemId}/permission-grants/{grantId}:
+    delete:
+      operationId: revokePermissionGrant
+      summary: Revoke a permission grant
+      description: |-
+        **Purpose:** Ends a permission grant, so that its holder can no longer use it on the item
+        or on anything inside it.
+
+        **When to use:** When a person leaves a case or a team, or a service no longer needs
+        access.
+
+        **You provide:** The item and the identifier of the grant.
+
+        **You get back:** A confirmation. Requests through the revoked grant are refused from now
+        on, on every channel.
+
+        **Rules:** You must hold the share permission on the item. A grant inherited from a
+        Container above is revoked on that Container, not here; you are told so. The holder may
+        still have access through another grant.
+
+        **Related:** Use "List who holds which permissions on an item" to find the grant.
+
+        ---
+
+        **Technical notes:** Returns `204`. An inherited grant returns `409` `inherited-grant`.
+        Requirements: ACC-1.
+      tags: [Permissions]
+      security:
+        - userOAuth: [bb:document-management:permission:manage]
+        - serviceOAuth: [bb:document-management:permission:manage]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/GrantId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      responses:
+        '204':
+          description: The grant is revoked.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/items/{itemId}/share-links:
+    get:
+      operationId: listShareLinks
+      summary: List the share links of an item
+      description: |-
+        **Purpose:** Shows the links through which a File or Container can be reached without an
+        account, so that none stays open unnoticed.
+
+        **When to use:** Before revoking a link, or when a manager reviews how a case file has
+        been shared.
+
+        **You provide:** The identifier of the File or Container, and how many links you want per
+        page.
+
+        **You get back:** One page of share links with their kind of access, expiry date, whether
+        a password protects them, and who created them.
+
+        **Rules:** You must hold the share permission on the item. Revoked and expired links are
+        not listed.
+
+        **Related:** Use "Revoke a share link" to end one.
+
+        ---
+
+        **Technical notes:** Cursor pagination, newest first, with `shareLinkId` as tie-breaker.
+        The link address is returned only when the link is created. Requirements: ACC-11.
+      tags: [Share links]
+      security:
+        - userOAuth: [bb:document-management:share-link:manage]
+        - serviceOAuth: [bb:document-management:share-link:manage]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          $ref: '#/components/responses/ShareLinkPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      operationId: createShareLink
+      summary: Create a share link
+      description: |-
+        **Purpose:** Creates a link that lets a person without an account download a File or
+        Container, or add Files to a Container without seeing what is in it.
+
+        **When to use:** When a permit office hands out an issued permit for download, or a
+        social services office asks a citizen to submit missing evidence.
+
+        **You provide:** The File or Container, the kind of access (download, or upload only),
+        and optionally an expiry date and a password. An upload-only link needs an expiry date.
+
+        **You get back:** The new link with its address. Pass the address to the recipient
+        through a channel of your choice; it is shown only now.
+
+        **Rules:** You must hold the share permission on the item. Upload-only links are
+        available for Containers only. A software solution may set a latest expiry date and
+        require a password; it says so instead of creating a weaker link. Anyone with the
+        address and the password can use the link until it expires or is revoked.
+
+        **Related:** Use "Revoke a share link" to end it early, and "Grant permissions on an
+        item" to share with named colleagues instead.
+
+        ---
+
+        **Technical notes:** Requires an `Idempotency-Key`; a retry returns the original link.
+        Returns `201` with `Location`. The password is write-only and never returned. A missing
+        expiry date for `UPLOAD` access, or one beyond the configured maximum, returns `422`
+        `invalid-field`; `UPLOAD` on a File returns `422` `invalid-link-access`.
+        Requirements: ACC-8, ACC-9, ACC-10.
+      tags: [Share links]
+      security:
+        - userOAuth: [bb:document-management:share-link:manage]
+        - serviceOAuth: [bb:document-management:share-link:manage]
+      x-govstack-pii: true
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareLinkCreate'
+            examples:
+              download:
+                summary: Hand out an issued permit for 30 days
+                value:
+                  access: READ
+                  expiresAt: '2026-12-17T23:59:59Z'
+              upload:
+                summary: Collect missing evidence with a password
+                value:
+                  access: UPLOAD
+                  expiresAt: '2026-11-30T23:59:59Z'
+                  password: correct-horse-battery-staple
+      responses:
+        '201':
+          $ref: '#/components/responses/ShareLinkCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/items/{itemId}/share-links/{shareLinkId}:
+    delete:
+      operationId: revokeShareLink
+      summary: Revoke a share link
+      description: |-
+        **Purpose:** Ends a share link at once, so that every later attempt to use it is refused.
+
+        **When to use:** When a link was sent to the wrong person, the case is closed, or the
+        documents have been collected.
+
+        **You provide:** The item and the identifier of the link.
+
+        **You get back:** A confirmation.
+
+        **Rules:** You must hold the share permission on the item. Downloads already completed
+        through the link cannot be undone.
+
+        **Related:** Use "List the share links of an item" to find the link.
+
+        ---
+
+        **Technical notes:** Returns `204`. A repeated request returns `404`. Requirements: ACC-11.
+      tags: [Share links]
+      security:
+        - userOAuth: [bb:document-management:share-link:manage]
+        - serviceOAuth: [bb:document-management:share-link:manage]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/ItemId'
+        - $ref: '#/components/parameters/ShareLinkId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      responses:
+        '204':
+          description: The link is revoked.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/subscriptions:
+    get:
+      operationId: listSubscriptions
+      summary: List your event subscriptions
+      description: |-
+        **Purpose:** Shows the event subscriptions your service has registered, so that you can
+        check what you receive and where it goes.
+
+        **When to use:** When setting up or reviewing an integration with a process engine or
+        another service.
+
+        **You provide:** How many subscriptions you want per page.
+
+        **You get back:** One page of your subscriptions with their address, filters and state.
+
+        **Rules:** You see only the subscriptions created under your own identity.
+
+        **Related:** Use "Create an event subscription" and "Delete an event subscription".
+
+        ---
+
+        **Technical notes:** Cursor pagination, newest first, with `subscriptionId` as
+        tie-breaker. Requirements: INT-2.
+      tags: [Subscriptions]
+      security:
+        - serviceOAuth: [bb:document-management:subscription:manage]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          $ref: '#/components/responses/SubscriptionPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      operationId: createSubscription
+      summary: Create an event subscription
+      description: |-
+        **Purpose:** Asks the Document Management service to tell your service, at a web address
+        you name, when Files are created, changed, moved, deleted or restored.
+
+        **When to use:** When a process engine must start a review as soon as a document arrives,
+        instead of checking for new documents again and again.
+
+        **You provide:** The web address that receives the events, and optionally the Container
+        to watch (with or without the Containers inside it) and the kinds of events you want.
+
+        **You get back:** The new subscription with its identifier.
+
+        **Rules:** The address must use a secure connection. You receive events only about Files
+        you may read, and events never carry the name or the content of a File; read the File
+        through this API to get more. A failed delivery is retried.
+
+        **Related:** Use "Delete an event subscription" when you no longer need the events.
+
+        ---
+
+        **Technical notes:** Requires an `Idempotency-Key`. Returns `201` with `Location`. Events
+        are delivered as described by the `fileEvent` webhook. Requirements: INT-2.
+      tags: [Subscriptions]
+      security:
+        - serviceOAuth: [bb:document-management:subscription:manage]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreate'
+            example:
+              callbackUrl: https://process-engine.example/hooks/dms
+              containerId: cnt_permits_2026
+              includeSubContainers: true
+              eventTypes:
+                - global.govstack.document-management.file.created
+                - global.govstack.document-management.file.version-created
+      responses:
+        '201':
+          $ref: '#/components/responses/SubscriptionCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v1/subscriptions/{subscriptionId}:
+    get:
+      operationId: retrieveSubscription
+      summary: Retrieve one event subscription
+      description: |-
+        **Purpose:** Shows the details and state of one of your event subscriptions.
+
+        **When to use:** When checking whether a subscription is still active, for example after
+        deliveries stopped arriving.
+
+        **You provide:** The identifier of the subscription.
+
+        **You get back:** The subscription with its address, filters and state.
+
+        **Rules:** You can retrieve only your own subscriptions; others give a "not found"
+        answer.
+
+        ---
+
+        **Technical notes:** Requirements: INT-2.
+      tags: [Subscriptions]
+      security:
+        - serviceOAuth: [bb:document-management:subscription:manage]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/Subscription'
+        '304':
+          $ref: '#/components/responses/NotModified'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      operationId: deleteSubscription
+      summary: Delete an event subscription
+      description: |-
+        **Purpose:** Stops the delivery of events to your service for one subscription.
+
+        **When to use:** When an integration is switched off or replaced.
+
+        **You provide:** The identifier of the subscription.
+
+        **You get back:** A confirmation. Events already on their way may still arrive.
+
+        **Rules:** You can delete only your own subscriptions.
+
+        ---
+
+        **Technical notes:** Returns `204`. A repeated request returns `404`. Requirements: INT-2.
+      tags: [Subscriptions]
+      security:
+        - serviceOAuth: [bb:document-management:subscription:manage]
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      responses:
+        '204':
+          description: The subscription is deleted.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+webhooks:
+  fileEvent:
+    post:
+      operationId: receiveFileEvent
+      summary: Receive a File event
+      description: |-
+        **Purpose:** Tells a subscribed service that something happened to a File: it was
+        created, given a new Version, renamed, moved, deleted, restored or removed for good.
+
+        **When to use:** Implemented by the subscriber, at the address it registered with "Create
+        an event subscription".
+
+        **You provide:** As the subscriber, a confirmation that you received the event.
+
+        **You get back:** As the subscriber, an event with its identifier, its kind, the File and
+        Container concerned, who acted, when, and the reference of the request that caused it.
+
+        **Rules:** An event never carries the name or the content of a File. To learn more, read
+        the File through this API, where your permissions are checked again. The same event can
+        arrive more than once; use its identifier to recognise repeats. Events may arrive out of
+        order; use their time.
+
+        ---
+
+        **Technical notes:** CloudEvents 1.0 in structured mode (`application/cloudevents+json`).
+        The DMS retries a delivery that does not receive a `2xx` answer, with increasing delays,
+        for a period the deployment publishes; it then marks the subscription `SUSPENDED`. The
+        `source` is the URN of the deployment. Signed deliveries (INT-7) are not yet profiled.
+        Requirements: INT-1, INT-3.
+      tags: [Subscriptions]
+      security: []
+      x-govstack-pii: false
+      parameters:
+        - $ref: '#/components/parameters/Traceparent'
+        - $ref: '#/components/parameters/Tracestate'
+      requestBody:
+        required: true
+        content:
+          application/cloudevents+json:
+            schema:
+              $ref: '#/components/schemas/FileEvent'
+            example:
+              specversion: '1.0'
+              id: evt_5e0c63c22b8a4d3f
+              source: urn:govstack:document-management:deployment:example-ministry:prod
+              type: global.govstack.document-management.file.created
+              time: '2026-11-17T08:30:00Z'
+              datacontenttype: application/json
+              traceparent: 00-6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f-5b1e4d7ca8f01e2d-01
+              data:
+                fileId: fil_7a3d2c
+                containerId: cnt_case_00042
+                versionId: ver_7a3d2c_1
+                actorId: svc_permit_portal
+                correlationId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+      responses:
+        '204':
+          description: The subscriber received the event.
+        '400':
+          description: The subscriber could not read the event; the DMS does not retry it.
+        '500':
+          description: The subscriber failed to process the event; the DMS retries the delivery.
+        '503':
+          description: The subscriber is temporarily unavailable; the DMS retries the delivery.
+components:
+  parameters:
+    ContainerId:
+      name: containerId
+      in: path
+      required: true
+      description: Identifier of the Container, encoded as one path segment.
+      schema:
+        $ref: '#/components/schemas/ItemId'
+    FileId:
+      name: fileId
+      in: path
+      required: true
+      description: Identifier of the File, encoded as one path segment.
+      schema:
+        $ref: '#/components/schemas/ItemId'
+    ItemId:
+      name: itemId
+      in: path
+      required: true
+      description: Identifier of a File or a Container, encoded as one path segment.
+      schema:
+        $ref: '#/components/schemas/ItemId'
+    VersionId:
+      name: versionId
+      in: path
+      required: true
+      description: >-
+        Identifier of a Version, encoded as one path segment. It is unique within the deployment,
+        so it also identifies the File.
+      schema:
+        $ref: '#/components/schemas/OpaqueId'
+    GrantId:
+      name: grantId
+      in: path
+      required: true
+      description: Identifier of a permission grant on the item, encoded as one path segment.
+      schema:
+        $ref: '#/components/schemas/OpaqueId'
+    ShareLinkId:
+      name: shareLinkId
+      in: path
+      required: true
+      description: >-
+        Identifier of a share link, encoded as one path segment. It is not the secret token in
+        the link address.
+      schema:
+        $ref: '#/components/schemas/OpaqueId'
+    SubscriptionId:
+      name: subscriptionId
+      in: path
+      required: true
+      description: Identifier of an event subscription, encoded as one path segment.
+      schema:
+        $ref: '#/components/schemas/OpaqueId'
+    Traceparent:
+      name: traceparent
+      in: header
+      required: false
+      description: >-
+        W3C Trace Context. The DMS propagates a valid context and creates one when it is absent
+        or invalid. The trace-id is returned as `traceId` in problems, stored as
+        `correlationId` on uploads and carried into events.
+      schema:
+        type: string
+        pattern: '^[\da-f]{2}-[\da-f]{32}-[\da-f]{16}-[\da-f]{2}$'
+      example: 00-6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f-5b1e4d7ca8f01e2d-01
+    Tracestate:
+      name: tracestate
+      in: header
+      required: false
+      description: W3C Trace Context vendor state, propagated unchanged; it carries no personal data.
+      schema:
+        type: string
+        maxLength: 512
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >-
+        Client-generated, high-entropy key that makes a retry safe, sent as a Structured Field
+        String with its quotation marks and at most 200 characters inside them; a UUID is
+        recommended. A missing, malformed or oversized key returns `400`. Within
+        the replay window the deployment publishes (at least 24 hours), a retry with the same key
+        and the same request returns the original status and body. The same key with a different
+        request returns `422` `idempotency-key-mismatch`; a retry while the first request is still
+        running returns `409` `idempotency-key-in-use`.
+      schema:
+        type: string
+        minLength: 10
+        maxLength: 202
+        pattern: '^"(?:[\x20-\x21\x23-\x5B\x5D-\x7E]|\\["\\]){8,200}"$'
+      example: '"018f47d2-4c42-7ca4-bf47-2bd31f88b922"'
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      description: >-
+        One strong `ETag` that the target must still have for the request to proceed. Weak
+        validators and `*` are not accepted. A mismatch returns `412` and changes nothing.
+      schema:
+        $ref: '#/components/schemas/StrongETag'
+    IfNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      description: >-
+        `ETag` of a representation the caller already holds; `304` is returned when it is still
+        current. Authorisation is checked first.
+      schema:
+        type: string
+        maxLength: 258
+    PageSize:
+      name: pageSize
+      in: query
+      required: false
+      description: Maximum number of items in the page; default 50, maximum 200.
+      schema:
+        $ref: '#/components/schemas/PageSize'
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Continuation value from the previous page. Omit it for the first page.
+      schema:
+        $ref: '#/components/schemas/Cursor'
+    ItemTypeFilter:
+      name: itemType
+      in: query
+      required: false
+      description: Return only Files (`FILE`) or only Containers (`CONTAINER`). Omit for both.
+      schema:
+        type: string
+        enum: [FILE, CONTAINER]
+    ItemSort:
+      name: sort
+      in: query
+      required: false
+      description: |-
+        Order of the items: `name`, `createdAt`, `modifiedAt` or `sizeBytes`, with `-` in front
+        for descending order; separate several fields with commas. Default `name`. The item
+        identifier is always the last tie-breaker.
+      schema:
+        type: string
+        pattern: '^-?(name|createdAt|modifiedAt|sizeBytes)(,-?(name|createdAt|modifiedAt|sizeBytes)){0,3}$'
+      example: -modifiedAt
+  headers:
+    ETag:
+      description: Strong validator of the returned representation, suitable for `If-Match`.
+      required: true
+      schema:
+        $ref: '#/components/schemas/StrongETag'
+      example: '"fil-7a3d2c-r5"'
+    Location:
+      description: Address of the created resource.
+      required: true
+      schema:
+        type: string
+        format: uri-reference
+    CacheControl:
+      description: Protected responses and errors are not stored by caches.
+      required: true
+      schema:
+        type: string
+        const: no-store
+    ContentDisposition:
+      description: >-
+        `attachment` with the name of the File (RFC 6266, with `filename*` for names outside
+        ASCII).
+      schema:
+        type: string
+      example: attachment; filename="site-photo.jpg"
+    ContentLength:
+      description: Size of the content in bytes.
+      schema:
+        type: integer
+        minimum: 0
+    ReprDigest:
+      description: >-
+        SHA-256 digest of the content (RFC 9530), offered where the software solution computes
+        digests (MET-20).
+      schema:
+        type: string
+      example: 'sha-256=:X48E9qOokqqrvdts8nOJRJN3OWDUoyWxBf7kbu9DBPE=:'
+    RetryAfter:
+      description: Delay in seconds, or an HTTP date, before retrying.
+      schema:
+        type: string
+      example: '30'
+    WwwAuthenticate:
+      description: Bearer authentication challenge.
+      required: true
+      schema:
+        type: string
+      example: Bearer realm="document-management"
+  securitySchemes:
+    userOAuth:
+      type: oauth2
+      description: >-
+        Access tokens for a person, such as an official or a citizen, using a client application.
+        Authorization-code clients use PKCE (S256); ID Tokens are rejected. Scopes authorise the
+        client application; the permissions of the person on each item still apply.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://identity.example/authorize
+          tokenUrl: https://identity.example/token
+          scopes:
+            bb:document-management:item:read: Read Containers, Files, content, Versions and deleted items, and search.
+            bb:document-management:item:write: Create, update, upload, replace and restore items.
+            bb:document-management:item:delete: Delete and restore items.
+            bb:document-management:permission:manage: List, create and revoke permission grants.
+            bb:document-management:share-link:manage: List, create and revoke share links.
+    serviceOAuth:
+      type: oauth2
+      description: >-
+        Client credentials for a service application or another Building Block. Tokens are
+        audience- and scope-restricted; sender-constrained tokens are recommended. The service
+        identity is the principal whose permissions apply on each item.
+      flows:
+        clientCredentials:
+          tokenUrl: https://identity.example/token
+          scopes:
+            bb:document-management:item:read: Read Containers, Files, content, Versions and deleted items, and search.
+            bb:document-management:item:write: Create, update, upload, replace and restore items.
+            bb:document-management:item:delete: Delete and restore items.
+            bb:document-management:permission:manage: List, create and revoke permission grants.
+            bb:document-management:share-link:manage: List, create and revoke share links.
+            bb:document-management:subscription:manage: Create, list, retrieve and delete event subscriptions.
+  schemas:
+    Problem:
+      $ref: './common/govstack-openapi-common.yaml#/components/schemas/Problem'
+    ValidationProblem:
+      $ref: './common/govstack-openapi-common.yaml#/components/schemas/ValidationProblem'
+    PageInfo:
+      $ref: './common/govstack-openapi-common.yaml#/components/schemas/PageInfo'
+    UnprocessableProblem:
+      description: >-
+        A request that cannot be carried out. `invalid-field` carries `errors`; the other types
+        do not.
+      required: [type, title, status, traceId]
+      oneOf:
+        - $ref: '#/components/schemas/ValidationProblem'
+        - allOf:
+            - $ref: '#/components/schemas/Problem'
+            - type: object
+              description: A failure that is not attributable to one field.
+              not:
+                required: [errors]
+                description: Omits field errors.
+    ContentTooLargeProblem:
+      description: The content is larger than the maximum file size configured for the deployment.
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          description: States the limit that was exceeded (STO-7).
+          required: [maxSizeBytes]
+          properties:
+            maxSizeBytes:
+              type: integer
+              minimum: 0
+              description: Maximum size of one File, in bytes.
+    QuotaExceededProblem:
+      description: Storing the content would exceed the storage quota of the Container.
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          description: States the quota that would be exceeded (STO-14).
+          required: [quotaBytes]
+          properties:
+            quotaBytes:
+              type: integer
+              minimum: 0
+              description: Storage quota of the Container, in bytes.
+            usedBytes:
+              type: integer
+              minimum: 0
+              description: Storage already used in the Container, in bytes, where the software solution reports it.
+            quotaContainerId:
+              $ref: '#/components/schemas/ItemId'
+    Health:
+      type: object
+      description: Informational body; only the HTTP status decides availability.
+      properties:
+        description:
+          type: string
+          description: Public label of the service, without internal details.
+      examples:
+        - description: Document Management API
+    ItemId:
+      type: string
+      minLength: 1
+      maxLength: 256
+      pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+      description: >-
+        Opaque identifier of a File or Container, assigned by the DMS, unique within the
+        deployment across Files and Containers and never reassigned. It stays the same when the
+        item is renamed, moved, given a new Version or restored (STO-3). The value `search` is
+        reserved and never assigned.
+      examples: [fil_7a3d2c]
+    OpaqueId:
+      type: string
+      minLength: 1
+      maxLength: 256
+      pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+      description: Opaque identifier assigned by the DMS; clients do not infer any meaning from it.
+      examples: [ver_7a3d2c_2]
+    StrongETag:
+      type: string
+      minLength: 3
+      maxLength: 258
+      pattern: '^"[\x21\x23-\x7E]{1,256}"$'
+      description: One quoted strong entity tag. Weak validators and `*` are not accepted.
+      examples: ['"fil-7a3d2c-r5"']
+    PageSize:
+      type: integer
+      minimum: 1
+      maximum: 200
+      default: 50
+      description: >-
+        Maximum number of items in a page. Values outside the bounds return `400` `bad-request`.
+        With a cursor, omit it or repeat the value of the first request.
+    Cursor:
+      type: string
+      minLength: 1
+      maxLength: 1024
+      description: >-
+        Opaque continuation value from `pageInfo.nextCursor`. A malformed, expired or mismatched
+        cursor returns `400` `invalid-cursor`.
+    Timestamp:
+      type: string
+      format: date-time
+      description: RFC 3339 instant in UTC, with `Z`.
+      examples: ['2026-11-17T08:30:00Z']
+    ItemType:
+      type: string
+      x-extensible-enum: [FILE, CONTAINER]
+      description: >-
+        Kind of item. `FILE` and `CONTAINER` are defined in the File Management core; extensions
+        may add kinds, so clients ignore values they do not know.
+    Principal:
+      type: object
+      description: A user, group or service identity known to the DMS.
+      required: [type, id]
+      properties:
+        type:
+          type: string
+          x-extensible-enum: [USER, GROUP, SERVICE]
+          description: >-
+            Kind of principal. Software solutions that grant permissions by organisational unit
+            or role (ACC-7) may return further values; clients ignore values they do not know.
+        id:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: Identifier of the principal in the identity system used by the deployment.
+        displayName:
+          type: string
+          readOnly: true
+          description: Name of the principal for display, where the DMS knows it.
+    Owner:
+      type: object
+      description: The organisational unit or group a Container is assigned to (STO-9).
+      required: [type, id]
+      properties:
+        type:
+          type: string
+          x-extensible-enum: [ORGANISATIONAL_UNIT, GROUP]
+          description: Kind of owner; clients ignore values they do not know.
+        id:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: Identifier of the organisational unit or group.
+        displayName:
+          type: string
+          readOnly: true
+          description: Name of the owner for display, where the DMS knows it.
+    ItemName:
+      type: string
+      minLength: 1
+      maxLength: 255
+      pattern: '^[^/\\\x00-\x1F]+$'
+      description: >-
+        Name of the item, without path separators or control characters. Software solutions may
+        refuse a name already used by another item in the same Container (`409` `name-conflict`).
+    CustomMetadata:
+      type: object
+      description: >-
+        Metadata of the service application as key-value pairs with string values (MET-2), such
+        as an application number. Keys are case-sensitive.
+      maxProperties: 100
+      propertyNames:
+        description: A key starts with a letter and has at most 64 letters, digits, dots, hyphens or underscores.
+        pattern: '^[A-Za-z][A-Za-z0-9._-]{0,63}$'
+      additionalProperties:
+        type: string
+        maxLength: 1024
+        description: The value of the key, as text.
+      examples:
+        - applicationNumber: CP-2026-00042
+          documentCategory: site-photo
+    CustomMetadataPatch:
+      type: object
+      description: Changes to custom metadata; a `null` value removes the key.
+      maxProperties: 100
+      propertyNames:
+        description: A key starts with a letter and has at most 64 letters, digits, dots, hyphens or underscores.
+        pattern: '^[A-Za-z][A-Za-z0-9._-]{0,63}$'
+      additionalProperties:
+        type: [string, 'null']
+        maxLength: 1024
+        description: The new value of the key, or `null` to remove the key.
+    Digests:
+      type: object
+      description: Fingerprints of the content, where the software solution computes them (MET-20).
+      properties:
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+          description: SHA-256 digest of the content, as 64 lowercase hexadecimal characters.
+      examples:
+        - sha256: 5f8e3dbb2d0c8e1f4b7a9c6d2e1f0a3b4c5d6e7f8091a2b3c4d5e6f708192a3b
+    VersionSummary:
+      type: object
+      description: The current Version of a File.
+      required: [versionId, versionNumber]
+      properties:
+        versionId:
+          $ref: '#/components/schemas/OpaqueId'
+        versionNumber:
+          type: string
+          minLength: 1
+          maxLength: 32
+          description: >-
+            Label of the Version as shown to people, such as `3` or `1.2`. Numbers increase with
+            each new Version.
+    Container:
+      type: object
+      description: A Container, such as a folder, a team space or a case file.
+      required: [itemType, containerId, name, parentId, owner, managers, createdAt, createdBy, modifiedAt]
+      properties:
+        itemType:
+          type: string
+          const: CONTAINER
+          description: Always `CONTAINER`.
+        containerId:
+          $ref: '#/components/schemas/ItemId'
+        name:
+          $ref: '#/components/schemas/ItemName'
+        parentId:
+          description: Identifier of the Container above, or `null` for a Container at the top level.
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 256
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+        owner:
+          $ref: '#/components/schemas/Owner'
+        managers:
+          type: array
+          minItems: 1
+          maxItems: 50
+          description: Users or groups who manage the Container (STO-9).
+          items:
+            $ref: '#/components/schemas/Principal'
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+        createdBy:
+          $ref: '#/components/schemas/Principal'
+        modifiedAt:
+          $ref: '#/components/schemas/Timestamp'
+      examples:
+        - itemType: CONTAINER
+          containerId: cnt_case_00042
+          name: CP-2026-00042
+          parentId: cnt_permits_2026
+          owner:
+            type: ORGANISATIONAL_UNIT
+            id: ou_building_authority
+            displayName: Building Authority
+          managers:
+            - type: USER
+              id: usr_8f2c41
+          createdAt: '2026-11-17T08:12:00Z'
+          createdBy:
+            type: SERVICE
+            id: svc_permit_portal
+          modifiedAt: '2026-11-17T08:12:00Z'
+    ContainerCreate:
+      type: object
+      description: >-
+        A new Container. Give `parentId`, `owner` or both; a top-level Container needs `owner`.
+        Without `managers`, the caller becomes the manager; a service caller names them.
+      additionalProperties: false
+      required: [name]
+      anyOf:
+        - description: Inside an existing Container.
+          required: [parentId]
+        - description: At the top level, with an owner.
+          required: [owner]
+      properties:
+        name:
+          $ref: '#/components/schemas/ItemName'
+        parentId:
+          $ref: '#/components/schemas/ItemId'
+        owner:
+          $ref: '#/components/schemas/Owner'
+        managers:
+          type: array
+          minItems: 1
+          maxItems: 50
+          description: Users or groups who will manage the Container.
+          items:
+            $ref: '#/components/schemas/Principal'
+    ContainerUpdate:
+      type: object
+      description: >-
+        Changes to a Container as a JSON Merge Patch. Members not sent are unchanged. `parentId`
+        moves the Container; `owner` and `managers` are changed only by a manager.
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          $ref: '#/components/schemas/ItemName'
+        parentId:
+          $ref: '#/components/schemas/ItemId'
+        owner:
+          $ref: '#/components/schemas/Owner'
+        managers:
+          type: array
+          minItems: 1
+          maxItems: 50
+          description: The complete new list of managers.
+          items:
+            $ref: '#/components/schemas/Principal'
+    File:
+      type: object
+      description: The system metadata (MET-1) and custom metadata (MET-2) of a File.
+      required:
+        - itemType
+        - fileId
+        - name
+        - parentId
+        - mediaType
+        - sizeBytes
+        - createdAt
+        - createdBy
+        - modifiedAt
+        - currentVersion
+        - contentETag
+        - customMetadata
+      properties:
+        itemType:
+          type: string
+          const: FILE
+          description: Always `FILE`.
+        fileId:
+          $ref: '#/components/schemas/ItemId'
+        name:
+          $ref: '#/components/schemas/ItemName'
+        parentId:
+          $ref: '#/components/schemas/ItemId'
+        mediaType:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: IANA media type of the current Version, as determined by the DMS.
+          examples: [application/pdf]
+        sizeBytes:
+          type: integer
+          minimum: 0
+          description: Size of the current Version in bytes.
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+        createdBy:
+          $ref: '#/components/schemas/Principal'
+        modifiedAt:
+          $ref: '#/components/schemas/Timestamp'
+        modifiedBy:
+          $ref: '#/components/schemas/Principal'
+        currentVersion:
+          $ref: '#/components/schemas/VersionSummary'
+        contentETag:
+          $ref: '#/components/schemas/StrongETag'
+        digests:
+          $ref: '#/components/schemas/Digests'
+        customMetadata:
+          $ref: '#/components/schemas/CustomMetadata'
+        sourceService:
+          type: string
+          readOnly: true
+          description: >-
+            Authenticated service that uploaded the File (MET-10), where the software solution
+            records it. Callers cannot change it.
+        correlationId:
+          type: string
+          readOnly: true
+          pattern: '^[\da-f]{32}$'
+          description: >-
+            Trace-id of the upload request (MET-10), where the software solution records it.
+            Callers cannot change it.
+      examples:
+        - itemType: FILE
+          fileId: fil_7a3d2c
+          name: site-photo.jpg
+          parentId: cnt_case_00042
+          mediaType: image/jpeg
+          sizeBytes: 2483021
+          createdAt: '2026-11-17T08:14:03Z'
+          createdBy:
+            type: SERVICE
+            id: svc_permit_portal
+          modifiedAt: '2026-11-17T09:02:41Z'
+          currentVersion:
+            versionId: ver_7a3d2c_2
+            versionNumber: '2'
+          contentETag: '"ver_7a3d2c_2"'
+          digests:
+            sha256: 5f8e3dbb2d0c8e1f4b7a9c6d2e1f0a3b4c5d6e7f8091a2b3c4d5e6f708192a3b
+          customMetadata:
+            applicationNumber: CP-2026-00042
+            documentCategory: site-photo
+          sourceService: svc_permit_portal
+          correlationId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    FileUploadMetadata:
+      type: object
+      description: The metadata sent with a new File.
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          $ref: '#/components/schemas/ItemName'
+        customMetadata:
+          $ref: '#/components/schemas/CustomMetadata'
+    FileUpload:
+      type: object
+      description: >-
+        The parts of an upload. The `content` part carries the media type of the File in its own
+        `Content-Type`; the DMS determines the media type from the content and that header.
+      required: [metadata, content]
+      properties:
+        metadata:
+          $ref: '#/components/schemas/FileUploadMetadata'
+        content:
+          $ref: '#/components/schemas/BinaryContent'
+    BinaryContent:
+      type: string
+      contentMediaType: application/octet-stream
+      description: Content of a File, byte for byte. The maximum size is configured per deployment (STO-7).
+    FileUpdate:
+      type: object
+      description: >-
+        Changes to a File as a JSON Merge Patch. Members not sent are unchanged. `parentId` moves
+        the File. System metadata cannot be changed.
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name:
+          $ref: '#/components/schemas/ItemName'
+        parentId:
+          $ref: '#/components/schemas/ItemId'
+        customMetadata:
+          $ref: '#/components/schemas/CustomMetadataPatch'
+    Item:
+      description: A File or a Container.
+      oneOf:
+        - $ref: '#/components/schemas/File'
+        - $ref: '#/components/schemas/Container'
+      discriminator:
+        propertyName: itemType
+        mapping:
+          FILE: '#/components/schemas/File'
+          CONTAINER: '#/components/schemas/Container'
+    ItemPage:
+      type: object
+      description: One page of items.
+      required: [items, pageInfo]
+      properties:
+        items:
+          type: array
+          maxItems: 200
+          description: Items in the requested order.
+          items:
+            $ref: '#/components/schemas/Item'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+    Version:
+      type: object
+      description: One stored Version of the content of a File.
+      required: [versionId, versionNumber, createdAt, createdBy, sizeBytes, mediaType, isCurrent]
+      properties:
+        versionId:
+          $ref: '#/components/schemas/OpaqueId'
+        versionNumber:
+          type: string
+          minLength: 1
+          maxLength: 32
+          description: Label of the Version as shown to people.
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+        createdBy:
+          $ref: '#/components/schemas/Principal'
+        sizeBytes:
+          type: integer
+          minimum: 0
+          description: Size of the Version in bytes.
+        mediaType:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: IANA media type of the Version.
+        digests:
+          $ref: '#/components/schemas/Digests'
+        isCurrent:
+          type: boolean
+          description: Whether this is the current Version.
+        restoredFromVersionId:
+          description: The Version whose content this Version restored (STO-11), or `null`.
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 256
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+    VersionPage:
+      type: object
+      description: One page of Versions, newest first.
+      required: [items, pageInfo]
+      properties:
+        items:
+          type: array
+          maxItems: 200
+          description: Versions, newest first.
+          items:
+            $ref: '#/components/schemas/Version'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+    DeletedItem:
+      type: object
+      description: A deleted File or Container that can still be restored (STO-8, STO-23).
+      required: [itemId, itemType, name, originalParentId, deletedAt, deletedBy, purgeAt]
+      properties:
+        itemId:
+          $ref: '#/components/schemas/ItemId'
+        itemType:
+          $ref: '#/components/schemas/ItemType'
+        name:
+          $ref: '#/components/schemas/ItemName'
+        originalParentId:
+          description: The Container the item was deleted from, or `null` for a top-level Container.
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 256
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+        deletedAt:
+          $ref: '#/components/schemas/Timestamp'
+        deletedBy:
+          $ref: '#/components/schemas/Principal'
+        purgeAt:
+          $ref: '#/components/schemas/Timestamp'
+    DeletedItemPage:
+      type: object
+      description: One page of deleted items, newest deletion first.
+      required: [items, pageInfo]
+      properties:
+        items:
+          type: array
+          maxItems: 200
+          description: Deleted items.
+          items:
+            $ref: '#/components/schemas/DeletedItem'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+    TimeRange:
+      type: object
+      description: An interval; `from` is included and `to` is excluded. Give one or both.
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        from:
+          $ref: '#/components/schemas/Timestamp'
+        to:
+          $ref: '#/components/schemas/Timestamp'
+    SizeRange:
+      type: object
+      description: A size interval in bytes; both bounds are included. Give one or both.
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        min:
+          type: integer
+          minimum: 0
+          description: Smallest size in bytes.
+        max:
+          type: integer
+          minimum: 0
+          description: Largest size in bytes.
+    NameCriterion:
+      type: object
+      description: >-
+        Match on the name: `equals` is an exact match, `contains` a case-insensitive substring.
+        Give one of them.
+      additionalProperties: false
+      minProperties: 1
+      maxProperties: 1
+      properties:
+        equals:
+          $ref: '#/components/schemas/ItemName'
+        contains:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Part of the name.
+    SearchCriteria:
+      type: object
+      description: >-
+        Criteria that must all match. `customMetadata` (MET-4) is RECOMMENDED; the others are
+        required for the File Management core (MET-3).
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        itemType:
+          type: string
+          enum: [FILE, CONTAINER]
+          description: Only Files or only Containers.
+        withinContainerId:
+          $ref: '#/components/schemas/ItemId'
+        includeSubContainers:
+          type: boolean
+          default: true
+          description: With `withinContainerId`, whether to search the Containers inside it too.
+        name:
+          $ref: '#/components/schemas/NameCriterion'
+        mediaType:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: Exact IANA media type.
+        createdBy:
+          $ref: '#/components/schemas/Principal'
+        createdWithin:
+          $ref: '#/components/schemas/TimeRange'
+        modifiedWithin:
+          $ref: '#/components/schemas/TimeRange'
+        sizeWithin:
+          $ref: '#/components/schemas/SizeRange'
+        customMetadata:
+          $ref: '#/components/schemas/CustomMetadata'
+    SearchRequest:
+      type: object
+      description: A search with its order and page controls.
+      additionalProperties: false
+      required: [criteria]
+      properties:
+        criteria:
+          $ref: '#/components/schemas/SearchCriteria'
+        sort:
+          type: string
+          pattern: '^-?(name|createdAt|modifiedAt|sizeBytes)(,-?(name|createdAt|modifiedAt|sizeBytes)){0,3}$'
+          description: >-
+            Order of the results, as for listing a Container. Default `-modifiedAt`; the item
+            identifier is the last tie-breaker.
+        pageSize:
+          $ref: '#/components/schemas/PageSize'
+        cursor:
+          $ref: '#/components/schemas/Cursor'
+    PermissionName:
+      type: string
+      x-extensible-enum: [READ, WRITE, DELETE, SHARE]
+      description: >-
+        `READ` the item and its content; `WRITE` change it and, for a Container, add to it;
+        `DELETE` delete and restore it; `SHARE` grant and revoke permissions and create share
+        links. Clients ignore values they do not know.
+    PermissionGrant:
+      type: object
+      description: Permissions held by one principal on an item (ACC-1, ACC-3).
+      required: [grantId, itemId, principal, permissions, inheritedFromId, expiresAt, grantedAt]
+      properties:
+        grantId:
+          $ref: '#/components/schemas/OpaqueId'
+        itemId:
+          $ref: '#/components/schemas/ItemId'
+        principal:
+          $ref: '#/components/schemas/Principal'
+        permissions:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          maxItems: 16
+          description: The permissions the grant gives.
+          items:
+            $ref: '#/components/schemas/PermissionName'
+        inheritedFromId:
+          description: >-
+            The Container the grant is inherited from (ACC-2), or `null` when it is given on the
+            item itself.
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 256
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+        expiresAt:
+          description: End of the grant, or `null` when it does not end.
+          type: [string, 'null']
+          format: date-time
+        grantedAt:
+          $ref: '#/components/schemas/Timestamp'
+        grantedBy:
+          $ref: '#/components/schemas/Principal'
+      examples:
+        - grantId: grt_51c0
+          itemId: cnt_case_00042
+          principal:
+            type: USER
+            id: usr_31d9a0
+          permissions: [READ, WRITE]
+          inheritedFromId: null
+          expiresAt: null
+          grantedAt: '2026-11-17T08:20:00Z'
+          grantedBy:
+            type: USER
+            id: usr_8f2c41
+    PermissionGrantCreate:
+      type: object
+      description: A new permission grant.
+      additionalProperties: false
+      required: [principal, permissions]
+      properties:
+        principal:
+          $ref: '#/components/schemas/Principal'
+        permissions:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          maxItems: 4
+          description: The permissions to give.
+          items:
+            type: string
+            enum: [READ, WRITE, DELETE, SHARE]
+            description: >-
+              `READ` the item and its content; `WRITE` change it and, for a Container, add to it;
+              `DELETE` delete and restore it; `SHARE` grant and revoke permissions and create
+              share links.
+        expiresAt:
+          $ref: '#/components/schemas/Timestamp'
+    PermissionGrantPage:
+      type: object
+      description: One page of permission grants.
+      required: [items, pageInfo]
+      properties:
+        items:
+          type: array
+          maxItems: 200
+          description: Grants on the item itself first, then inherited grants.
+          items:
+            $ref: '#/components/schemas/PermissionGrant'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+    LinkAccess:
+      type: string
+      x-extensible-enum: [READ, UPLOAD]
+      description: >-
+        `READ` lets the recipient download the File, or the Files of the Container (ACC-8).
+        `UPLOAD` lets the recipient add Files to a Container without seeing its contents
+        (ACC-10). Clients ignore values they do not know.
+    ShareLink:
+      type: object
+      description: A link that gives access to one item without an account.
+      required: [shareLinkId, itemId, access, expiresAt, passwordProtected, createdAt, createdBy]
+      properties:
+        shareLinkId:
+          $ref: '#/components/schemas/OpaqueId'
+        itemId:
+          $ref: '#/components/schemas/ItemId'
+        access:
+          $ref: '#/components/schemas/LinkAccess'
+        url:
+          type: string
+          format: uri
+          readOnly: true
+          description: >-
+            Address of the link. It contains a secret and is returned only in the answer to
+            "Create a share link".
+        expiresAt:
+          description: End of the link, or `null` for a download link without an end.
+          type: [string, 'null']
+          format: date-time
+        passwordProtected:
+          type: boolean
+          description: Whether the recipient must enter a password (ACC-9).
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+        createdBy:
+          $ref: '#/components/schemas/Principal'
+      examples:
+        - shareLinkId: shl_0c19
+          itemId: fil_permit_00042
+          access: READ
+          url: https://dms.example/s/Qm9tX3Rva2VuX2V4YW1wbGU
+          expiresAt: '2026-12-17T23:59:59Z'
+          passwordProtected: false
+          createdAt: '2026-11-17T10:00:00Z'
+          createdBy:
+            type: USER
+            id: usr_8f2c41
+    ShareLinkCreate:
+      type: object
+      description: A new share link.
+      additionalProperties: false
+      required: [access]
+      properties:
+        access:
+          type: string
+          enum: [READ, UPLOAD]
+          description: Kind of access. `UPLOAD` needs `expiresAt` and a Container.
+        expiresAt:
+          $ref: '#/components/schemas/Timestamp'
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+          maxLength: 256
+          description: Password the recipient must enter; never returned.
+    ShareLinkPage:
+      type: object
+      description: One page of share links, newest first.
+      required: [items, pageInfo]
+      properties:
+        items:
+          type: array
+          maxItems: 200
+          description: Share links without their address.
+          items:
+            $ref: '#/components/schemas/ShareLink'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+    FileEventType:
+      type: string
+      x-extensible-enum:
+        - global.govstack.document-management.file.created
+        - global.govstack.document-management.file.version-created
+        - global.govstack.document-management.file.renamed
+        - global.govstack.document-management.file.moved
+        - global.govstack.document-management.file.deleted
+        - global.govstack.document-management.file.restored
+        - global.govstack.document-management.file.purged
+      description: >-
+        Kind of File event (INT-1). Extensions add further kinds, such as records events; clients
+        ignore values they do not know.
+    Subscription:
+      type: object
+      description: A registration for File events delivered by webhook (INT-2).
+      required: [subscriptionId, callbackUrl, containerId, includeSubContainers, eventTypes, status, createdAt]
+      properties:
+        subscriptionId:
+          $ref: '#/components/schemas/OpaqueId'
+        callbackUrl:
+          type: string
+          format: uri
+          pattern: '^https://'
+          maxLength: 2048
+          description: Address that receives the events.
+        containerId:
+          description: The Container watched, or `null` for every Container the subscriber may read.
+          type: [string, 'null']
+          minLength: 1
+          maxLength: 256
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._~-]{0,255}$'
+        includeSubContainers:
+          type: boolean
+          description: Whether events from the Containers inside the watched one are delivered.
+        eventTypes:
+          type: array
+          minItems: 1
+          maxItems: 32
+          uniqueItems: true
+          description: Kinds of events delivered.
+          items:
+            $ref: '#/components/schemas/FileEventType'
+        status:
+          type: string
+          x-extensible-enum: [ACTIVE, SUSPENDED]
+          description: >-
+            `ACTIVE` while events are delivered; `SUSPENDED` after deliveries failed for longer
+            than the retry period. Clients ignore values they do not know.
+        createdAt:
+          $ref: '#/components/schemas/Timestamp'
+      examples:
+        - subscriptionId: sub_3e81
+          callbackUrl: https://process-engine.example/hooks/dms
+          containerId: cnt_permits_2026
+          includeSubContainers: true
+          eventTypes:
+            - global.govstack.document-management.file.created
+            - global.govstack.document-management.file.version-created
+          status: ACTIVE
+          createdAt: '2026-11-17T07:55:00Z'
+    SubscriptionCreate:
+      type: object
+      description: A new event subscription. Without `eventTypes`, every kind of File event is delivered.
+      additionalProperties: false
+      required: [callbackUrl]
+      properties:
+        callbackUrl:
+          type: string
+          format: uri
+          pattern: '^https://'
+          maxLength: 2048
+          description: Address that receives the events; it must use HTTPS.
+        containerId:
+          $ref: '#/components/schemas/ItemId'
+        includeSubContainers:
+          type: boolean
+          default: true
+          description: Whether to include events from the Containers inside the watched one.
+        eventTypes:
+          type: array
+          minItems: 1
+          maxItems: 32
+          uniqueItems: true
+          description: Kinds of events to deliver.
+          items:
+            type: string
+            description: >-
+              A File is created, given a new Version, renamed, moved, deleted, restored or
+              removed for good (purged).
+            enum:
+              - global.govstack.document-management.file.created
+              - global.govstack.document-management.file.version-created
+              - global.govstack.document-management.file.renamed
+              - global.govstack.document-management.file.moved
+              - global.govstack.document-management.file.deleted
+              - global.govstack.document-management.file.restored
+              - global.govstack.document-management.file.purged
+    SubscriptionPage:
+      type: object
+      description: One page of subscriptions, newest first.
+      required: [items, pageInfo]
+      properties:
+        items:
+          type: array
+          maxItems: 200
+          description: Subscriptions of the caller.
+          items:
+            $ref: '#/components/schemas/Subscription'
+        pageInfo:
+          $ref: '#/components/schemas/PageInfo'
+    FileEvent:
+      type: object
+      description: >-
+        A File event as a CloudEvent in structured mode (INT-1, INT-3). It never carries the
+        name or the content of the File.
+      required: [specversion, id, source, type, time, datacontenttype, data]
+      properties:
+        specversion:
+          type: string
+          const: '1.0'
+          description: CloudEvents version.
+        id:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: Identifier of the event, unique for its `source`; repeats carry the same value.
+        source:
+          type: string
+          format: uri-reference
+          minLength: 1
+          description: Stable URN of the deployment that produced the event.
+        type:
+          $ref: '#/components/schemas/FileEventType'
+        time:
+          $ref: '#/components/schemas/Timestamp'
+        datacontenttype:
+          type: string
+          const: application/json
+          description: Media type of `data`.
+        traceparent:
+          type: string
+          description: W3C Trace Context of the request that caused the event (CloudEvents distributed tracing extension).
+        data:
+          $ref: '#/components/schemas/FileEventData'
+    FileEventData:
+      type: object
+      description: What happened, to which File, by whom.
+      required: [fileId, containerId, actorId]
+      properties:
+        fileId:
+          $ref: '#/components/schemas/ItemId'
+        containerId:
+          $ref: '#/components/schemas/ItemId'
+        previousContainerId:
+          $ref: '#/components/schemas/ItemId'
+        versionId:
+          $ref: '#/components/schemas/OpaqueId'
+        actorId:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: Identifier of the user, service or automated agent that acted.
+        correlationId:
+          type: string
+          pattern: '^[\da-f]{32}$'
+          description: Trace-id of the request that caused the event, where there was one.
+  responses:
+    Container:
+      description: The Container.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Container'
+    ContainerCreated:
+      description: The Container is created.
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Container'
+      links:
+        createdContainer:
+          operationId: retrieveContainer
+          description: Retrieve the new Container.
+          parameters:
+            containerId: '$response.body#/containerId'
+    File:
+      description: The details of the File.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/File'
+    FileCreated:
+      description: The File is stored with its first Version.
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/File'
+      links:
+        createdFile:
+          operationId: retrieveFile
+          description: Retrieve the details of the new File.
+          parameters:
+            fileId: '$response.body#/fileId'
+        content:
+          operationId: downloadFileContent
+          description: Download the content of the new File.
+          parameters:
+            fileId: '$response.body#/fileId'
+    FileContentReplaced:
+      description: The new content is stored as the current Version.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/File'
+    FileContent:
+      description: >-
+        The content, byte for byte. `Content-Type` is the stored media type of the File; the
+        strong `ETag` identifies the Version.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Content-Disposition:
+          $ref: '#/components/headers/ContentDisposition'
+        Content-Length:
+          $ref: '#/components/headers/ContentLength'
+        Repr-Digest:
+          $ref: '#/components/headers/ReprDigest'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/BinaryContent'
+    Item:
+      description: The restored File or Container.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Item'
+          example:
+            itemType: FILE
+            fileId: fil_2d77e1
+            name: site-photo-blurred.jpg
+            parentId: cnt_case_00042
+            mediaType: image/jpeg
+            sizeBytes: 1203554
+            createdAt: '2026-11-16T15:31:12Z'
+            createdBy:
+              type: SERVICE
+              id: svc_permit_portal
+            modifiedAt: '2026-11-17T10:22:05Z'
+            currentVersion:
+              versionId: ver_2d77e1_1
+              versionNumber: '1'
+            contentETag: '"ver_2d77e1_1"'
+            customMetadata: {}
+    ItemPage:
+      description: One page of items.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemPage'
+          example:
+            items:
+              - itemType: CONTAINER
+                containerId: cnt_case_00042_photos
+                name: Photos
+                parentId: cnt_case_00042
+                owner:
+                  type: ORGANISATIONAL_UNIT
+                  id: ou_building_authority
+                managers:
+                  - type: USER
+                    id: usr_8f2c41
+                createdAt: '2026-11-17T08:12:30Z'
+                createdBy:
+                  type: SERVICE
+                  id: svc_permit_portal
+                modifiedAt: '2026-11-17T08:12:30Z'
+              - itemType: FILE
+                fileId: fil_91be04
+                name: ownership-certificate.pdf
+                parentId: cnt_case_00042
+                mediaType: application/pdf
+                sizeBytes: 184320
+                createdAt: '2026-11-17T08:13:10Z'
+                createdBy:
+                  type: SERVICE
+                  id: svc_permit_portal
+                modifiedAt: '2026-11-17T08:13:10Z'
+                currentVersion:
+                  versionId: ver_91be04_1
+                  versionNumber: '1'
+                contentETag: '"ver_91be04_1"'
+                customMetadata:
+                  applicationNumber: CP-2026-00042
+            pageInfo:
+              nextCursor: null
+    VersionPage:
+      description: One page of Versions.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VersionPage'
+          example:
+            items:
+              - versionId: ver_7a3d2c_2
+                versionNumber: '2'
+                createdAt: '2026-11-17T09:02:41Z'
+                createdBy:
+                  type: SERVICE
+                  id: svc_permit_portal
+                sizeBytes: 2483021
+                mediaType: image/jpeg
+                digests:
+                  sha256: 5f8e3dbb2d0c8e1f4b7a9c6d2e1f0a3b4c5d6e7f8091a2b3c4d5e6f708192a3b
+                isCurrent: true
+                restoredFromVersionId: null
+              - versionId: ver_7a3d2c_1
+                versionNumber: '1'
+                createdAt: '2026-11-17T08:14:03Z'
+                createdBy:
+                  type: SERVICE
+                  id: svc_permit_portal
+                sizeBytes: 1932870
+                mediaType: image/jpeg
+                isCurrent: false
+                restoredFromVersionId: null
+            pageInfo:
+              nextCursor: null
+    DeletedItemPage:
+      description: One page of deleted items.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeletedItemPage'
+          example:
+            items:
+              - itemId: fil_2d77e1
+                itemType: FILE
+                name: site-photo-blurred.jpg
+                originalParentId: cnt_case_00042
+                deletedAt: '2026-11-16T15:40:00Z'
+                deletedBy:
+                  type: USER
+                  id: usr_31d9a0
+                purgeAt: '2026-12-16T15:40:00Z'
+            pageInfo:
+              nextCursor: c_dl_42
+    PermissionGrantPage:
+      description: One page of permission grants.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PermissionGrantPage'
+          example:
+            items:
+              - grantId: grt_51c0
+                itemId: cnt_case_00042
+                principal:
+                  type: USER
+                  id: usr_31d9a0
+                permissions: [READ, WRITE]
+                inheritedFromId: null
+                expiresAt: null
+                grantedAt: '2026-11-17T08:20:00Z'
+              - grantId: grt_0a11
+                itemId: cnt_case_00042
+                principal:
+                  type: GROUP
+                  id: grp_building_case_officers
+                permissions: [READ]
+                inheritedFromId: cnt_permits_2026
+                expiresAt: null
+                grantedAt: '2026-01-05T09:00:00Z'
+            pageInfo:
+              nextCursor: null
+    PermissionGrantCreated:
+      description: The permission grant is created.
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PermissionGrant'
+    ShareLinkCreated:
+      description: The share link is created; the answer carries its address, shown only once.
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ShareLink'
+    ShareLinkPage:
+      description: One page of share links.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ShareLinkPage'
+          example:
+            items:
+              - shareLinkId: shl_0c19
+                itemId: fil_permit_00042
+                access: READ
+                expiresAt: '2026-12-17T23:59:59Z'
+                passwordProtected: false
+                createdAt: '2026-11-17T10:00:00Z'
+                createdBy:
+                  type: USER
+                  id: usr_8f2c41
+            pageInfo:
+              nextCursor: null
+    Subscription:
+      description: The subscription.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Subscription'
+    SubscriptionCreated:
+      description: The subscription is created and active.
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Subscription'
+    SubscriptionPage:
+      description: One page of subscriptions.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubscriptionPage'
+          example:
+            items:
+              - subscriptionId: sub_3e81
+                callbackUrl: https://process-engine.example/hooks/dms
+                containerId: cnt_permits_2026
+                includeSubContainers: true
+                eventTypes:
+                  - global.govstack.document-management.file.created
+                status: ACTIVE
+                createdAt: '2026-11-17T07:55:00Z'
+            pageInfo:
+              nextCursor: null
+    NotModified:
+      description: The representation you hold is still current.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+    BadRequest:
+      description: >-
+        The request is malformed: invalid JSON, unknown or wrongly typed members, invalid query
+        or header values, a missing or malformed `Idempotency-Key`, or invalid page controls
+        (`bad-request`). A malformed, expired or mismatched continuation value returns
+        `invalid-cursor`.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            malformed:
+              value:
+                type: https://govstack.global/problems/document-management/bad-request
+                title: Invalid request
+                status: 400
+                detail: The member "parentId" must be a string.
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            cursor:
+              value:
+                type: https://govstack.global/problems/document-management/invalid-cursor
+                title: Invalid continuation
+                status: 400
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    Unauthorized:
+      description: The access token is missing, expired or invalid.
+      headers:
+        WWW-Authenticate:
+          $ref: '#/components/headers/WwwAuthenticate'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/unauthorized
+            title: Authentication required
+            status: 401
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    Forbidden:
+      description: >-
+        The caller may see the item but lacks the permission or scope for this operation. When
+        the caller may not read the item at all, the answer is `404` instead (ACC-6).
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/forbidden
+            title: Operation not permitted
+            status: 403
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    NotFound:
+      description: >-
+        The item, Version, grant, link or subscription does not exist, has been deleted, or the
+        caller may not know that it exists. The answer is the same in every case (ACC-6).
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/not-found
+            title: Not found
+            status: 404
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    Conflict:
+      description: |-
+        The request conflicts with the current state:
+
+        - `name-conflict`: the software solution refuses a second item with the same name in the
+          Container.
+        - `deletion-blocked`: an item is protected (STO-18) or the caller may not delete an item
+          inside the Container.
+        - `restore-conflict`: the Container the item was deleted from no longer exists.
+        - `inherited-grant`: the grant is inherited and is revoked on its Container.
+        - `idempotency-key-in-use`: a request with the same `Idempotency-Key` is still running.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            nameConflict:
+              value:
+                type: https://govstack.global/problems/document-management/name-conflict
+                title: Name already in use
+                status: 409
+                detail: The Container already holds an item with this name.
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            deletionBlocked:
+              value:
+                type: https://govstack.global/problems/document-management/deletion-blocked
+                title: Deletion blocked
+                status: 409
+                detail: An item is protected and cannot be deleted.
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            restoreConflict:
+              value:
+                type: https://govstack.global/problems/document-management/restore-conflict
+                title: Original Container not available
+                status: 409
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            inheritedGrant:
+              value:
+                type: https://govstack.global/problems/document-management/inherited-grant
+                title: Grant is inherited
+                status: 409
+                detail: Revoke the grant on the Container it is inherited from.
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            idempotencyKeyInUse:
+              value:
+                type: https://govstack.global/problems/document-management/idempotency-key-in-use
+                title: Request still in progress
+                status: 409
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    PreconditionFailed:
+      description: >-
+        The item changed after the caller last retrieved it: the `ETag` in `If-Match` is no
+        longer current (STO-25). Nothing is changed.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/precondition-failed
+            title: Item has changed
+            status: 412
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    ContentTooLarge:
+      description: The content exceeds the maximum file size, which the answer states (STO-7).
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ContentTooLargeProblem'
+          example:
+            type: https://govstack.global/problems/document-management/content-too-large
+            title: File too large
+            status: 413
+            detail: The maximum size of a File is 104857600 bytes.
+            maxSizeBytes: 104857600
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    UnsupportedMediaType:
+      description: >-
+        The request body is not in a format this operation accepts, such as JSON sent where JSON
+        Merge Patch is expected.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/unsupported-media-type
+            title: Unsupported request format
+            status: 415
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    UnprocessableContent:
+      description: |-
+        The request is well formed but cannot be carried out:
+
+        - `invalid-field`: one or more members have values that are not allowed; `errors` names
+          them.
+        - `media-type-not-allowed`: the media type detected from the content is not on the
+          allow-list of the deployment (STO-12).
+        - `invalid-move`: a Container would be moved into itself or one of its own Containers.
+        - `invalid-link-access`: upload-only access was asked for a File.
+        - `unsupported-criterion` or `unsupported-field`: the software solution does not offer a
+          RECOMMENDED criterion or field that was sent.
+        - `idempotency-key-mismatch`: the `Idempotency-Key` was used for a different request.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/UnprocessableProblem'
+          examples:
+            invalidField:
+              value:
+                type: https://govstack.global/problems/document-management/invalid-field
+                title: Request validation failed
+                status: 422
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+                errors:
+                  - pointer: /expiresAt
+                    message: An upload-only link needs an expiry date.
+            mediaTypeNotAllowed:
+              value:
+                type: https://govstack.global/problems/document-management/media-type-not-allowed
+                title: Kind of file not allowed
+                status: 422
+                detail: Files of type application/x-msdownload are not accepted.
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            invalidMove:
+              value:
+                type: https://govstack.global/problems/document-management/invalid-move
+                title: Invalid move
+                status: 422
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            unsupportedCriterion:
+              value:
+                type: https://govstack.global/problems/document-management/unsupported-criterion
+                title: Search criterion not offered
+                status: 422
+                detail: Searching custom metadata is not offered by this software solution.
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+            idempotencyKeyMismatch:
+              value:
+                type: https://govstack.global/problems/document-management/idempotency-key-mismatch
+                title: Idempotency key reused
+                status: 422
+                traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    TooManyRequests:
+      description: The caller sent too many requests; retry after the time given.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/too-many-requests
+            title: Request rate exceeded
+            status: 429
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    InternalError:
+      description: The request could not be completed; the answer reveals no internal details.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/internal-error
+            title: Request could not be completed
+            status: 500
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    ServiceUnavailable:
+      description: The service temporarily cannot accept work.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://govstack.global/problems/document-management/service-unavailable
+            title: Service temporarily unavailable
+            status: 503
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f
+    QuotaExceeded:
+      description: Storing the content would exceed the storage quota of the Container, which the answer states (STO-14).
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/CacheControl'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/QuotaExceededProblem'
+          example:
+            type: https://govstack.global/problems/document-management/quota-exceeded
+            title: Storage quota exceeded
+            status: 507
+            detail: The storage quota of this Container is 10737418240 bytes.
+            quotaBytes: 10737418240
+            usedBytes: 10736001024
+            quotaContainerId: cnt_permits_2026
+            traceId: 6f1c3f0e2a9b4c8d7e6f5a4b3c2d1e0f

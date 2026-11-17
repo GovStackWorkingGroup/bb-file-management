@@ -16,7 +16,7 @@ requirements:
       Extends govstack-cfr-architecture#req-14.
       Constraint: a failed delivery is retried.
       Safeguards: INT-3 keeps File names and content out of events, and INT-7 signs each delivery.
-    api_operation_id:
+    api_operation_id: receiveFileEvent
     test:
   # INT-2 (working label; the number is issued on acceptance)
   - id:
@@ -27,7 +27,7 @@ requirements:
     statement: "The DMS registers event subscriptions, filtered by Container and event kind, through its API."
     documentation: |
       The filter by document type is in *Records Processes* (PRC-15).
-    api_operation_id:
+    api_operation_id: [createSubscription, listSubscriptions, retrieveSubscription, deleteSubscription]
     test:
   # INT-3 (working label; the number is issued on acceptance)
   - id:
@@ -36,7 +36,7 @@ requirements:
     observability: OBSERVABLE
     interaction: EVENT
     statement: "The DMS includes the event identifier, event kind, item identifier, Container identifier, actor identifier, timestamp and correlation identifier in each event, and leaves out the File name and content."
-    api_operation_id:
+    api_operation_id: receiveFileEvent
     test:
   # INT-4 (working label; the number is issued on acceptance)
   - id:
@@ -56,7 +56,7 @@ requirements:
     statement: "The DMS offers access to Containers and Files over WebDAV."
     documentation: |
       Constraint: WebDAV class 1 of IETF RFC 4918.
-      Whether the Service API of this specification adopts a WebDAV profile is an open question. Possible contract classifiers IETF RFC 4918, HTTP Extensions for WebDAV
+      WebDAV is an access channel in addition to the Service API (`api/openapi.yaml`), not a replacement for it; ACC-4 applies the same permissions on both. Possible contract classifiers IETF RFC 4918, HTTP Extensions for WebDAV
     api_operation_id:
     test:
   # INT-7 (working label; the number is issued on acceptance)

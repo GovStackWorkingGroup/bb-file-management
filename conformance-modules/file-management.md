@@ -46,8 +46,8 @@ Every conformant software solution meets the File Management core. The Working D
 
 | Interface | Counterpart | Direction | Functionalities | Type | Contract defined in |
 |---|---|---|---|---|---|
-| Document Management API | Service application, administrator | Inbound | All File Management functionalities | Service API | This specification, `resources/api` (to be written) |
+| Document Management API | Service application, administrator | Inbound | All File Management functionalities | Service API | This specification, `api/openapi.yaml` (draft: Containers, Files, Versions, deleted items, search, permission grants, share links, subscriptions); see `resources/api-reference.md` |
 | WebDAV access | Clients and service applications | Inbound | Integration and Events (INT-5) | Service API | IETF RFC 4918 |
 | Share page | Link recipient | Inbound | File Sharing (ACC-9) | User interface | This specification |
-| File events | Event subscriber | Outbound | Integration and Events | Event | This specification |
+| File events | Event subscriber | Outbound | Integration and Events | Event | This specification, webhook `fileEvent` in `api/openapi.yaml` (CloudEvents 1.0) |
 | Exports and reports | Administrator, other systems | Outbound | File Storage (STO-10), Usage Reporting (RPT-5) | File | This specification |
