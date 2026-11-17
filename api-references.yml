@@ -1,0 +1,5 @@
+references:
+  - id: document-management
+    page: resources/api-specification.md
+    contract: api/openapi.yaml
+    role: normative
