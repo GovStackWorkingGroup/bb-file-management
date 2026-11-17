@@ -30,6 +30,7 @@ toc:
     - document-exchange.md
     - issued-documents.md
   resources:
+    - api-specification.md
     - api-reference.md
     - reference-software.md
     - open-questions.md
